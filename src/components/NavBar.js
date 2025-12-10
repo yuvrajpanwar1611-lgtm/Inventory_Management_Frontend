@@ -70,35 +70,33 @@ const NavBar = () => {
   const [products] = useContext(ProductContext);
   const [user, setUser] = useState(null);
 
-  // ✔ FIXED: Always send Content-Type + Authorization
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!token) return; // ❗ WAIT until token exists before calling API
 
     try {
       const res = await fetch("https://inventory-management-ero4.onrender.com/users/me", {
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token,
+          Authorization: "Bearer " + token,
         },
       });
 
-      // If token invalid → logout
       if (res.status === 401) {
-        localStorage.removeItem("token");
-        window.location.href = "/login";
+        // ❗ Do NOT logout immediately, just stop loading user
+        console.warn("Unauthorized /users/me — but token exists. Not logging out.");
         return;
       }
 
       const data = await res.json();
       setUser(data);
     } catch (err) {
-      console.error("Failed to fetch user", err);
+      console.error("User fetch failed:", err);
     }
   };
 
   useEffect(() => {
-    fetchUser();
+    // ❗ Delay fetch until token is ready
+    setTimeout(fetchUser, 150); 
   }, []);
 
   return (
@@ -131,3 +129,4 @@ const NavBar = () => {
 };
 
 export default NavBar;
+

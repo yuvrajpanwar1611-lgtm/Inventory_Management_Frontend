@@ -21,7 +21,7 @@ const SellProduct = () => {
   }, []);
 
   const loadProducts = async () => {
-    const res = await secureFetch("http://127.0.0.1:8000/product");
+    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const data = await res.json();
     setProducts(data.data || []);
   };
@@ -97,7 +97,7 @@ const SellProduct = () => {
     setLoading(true);
 
     // 🔥 NEW API ENDPOINT (/product/sell)
-    const res = await secureFetch("http://127.0.0.1:8000/product/sell", {
+    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product/sell", {
       method: "POST",
       body: JSON.stringify(payload),
     });
@@ -110,7 +110,7 @@ const SellProduct = () => {
     alert("Sale completed!");
 
     // Save invoice file link
-    setInvoiceUrl("http://127.0.0.1:8000" + data.invoice_pdf);
+    setInvoiceUrl("https://inventory-management-ero4.onrender.com" + data.invoice_pdf);
 
     // Reset form
     setRows([{ id: Date.now(), product_id: "", qty: 1, sell_price: "", name: "", max_stock: 0 }]);

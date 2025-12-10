@@ -39,7 +39,7 @@ const ProductsTable = () => {
   };
 
   const fetchProducts = async () => {
-    const res = await secureFetch("http://127.0.0.1:8000/product");
+    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const data = await res.json();
     setProducts({ data: data.data || [] });
   };
@@ -64,7 +64,7 @@ const ProductsTable = () => {
   const handleDelete = async (p) => {
     if (!window.confirm("Delete this product?")) return;
 
-    const res = await secureFetch(`http://127.0.0.1:8000/product/${p.id}`, {
+    const res = await secureFetch(`https://inventory-management-ero4.onrender.com/product/${p.id}`, {
       method: "DELETE",
     });
 
@@ -87,7 +87,7 @@ const ProductsTable = () => {
     setSupplierModalOpen(true);
 
     try {
-      const res = await secureFetch(`http://127.0.0.1:8000/supplier/${supplierId}`);
+      const res = await secureFetch(`https://inventory-management-ero4.onrender.com/supplier/${supplierId}`);
       const json = await res.json();
 
       // FIX: now always gives clean supplier object

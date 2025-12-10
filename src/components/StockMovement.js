@@ -9,7 +9,7 @@ const StockMovement = () => {
 
   // Load all movements
   const loadMovements = async () => {
-    const res = await secureFetch("http://127.0.0.1:8000/movements");
+    const res = await secureFetch("https://inventory-management-ero4.onrender.com/movements");
     const data = await res.json();
     setMovements(data.data || []);
     setFilteredMovements(data.data || []);
@@ -17,7 +17,7 @@ const StockMovement = () => {
 
   // Load product list for filter
   const loadProducts = async () => {
-    const res = await secureFetch("http://127.0.0.1:8000/product");
+    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const data = await res.json();
     setProducts(data.data || []);
   };
@@ -125,7 +125,7 @@ const StockMovement = () => {
                   {/* DOWNLOAD INVOICE BUTTON */}
                   {m.invoice_number && (
                     <a
-                      href={`http://127.0.0.1:8000/download_invoice/${m.invoice_number}`}
+                      href={`https://inventory-management-ero4.onrender.com/download_invoice/${m.invoice_number}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-primary btn-sm mt-2"

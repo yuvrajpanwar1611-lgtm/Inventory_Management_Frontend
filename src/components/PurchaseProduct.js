@@ -15,10 +15,10 @@ const PurchaseProduct = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const loadData = async () => {
-    const prod = await secureFetch("http://127.0.0.1:8000/product");
+    const prod = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const prodData = await prod.json();
 
-    const sup = await secureFetch("http://127.0.0.1:8000/supplier");
+    const sup = await secureFetch("https://inventory-management-ero4.onrender.com/supplier");
     const supData = await sup.json();
 
     setProducts(prodData.data || []);
@@ -53,7 +53,7 @@ const PurchaseProduct = () => {
     };
 
     const res = await secureFetch(
-      `http://127.0.0.1:8000/product/purchase/${form.productId}`,
+      `https://inventory-management-ero4.onrender.com/product/purchase/${form.productId}`,
       {
         method: "POST",
         body: JSON.stringify(payload),

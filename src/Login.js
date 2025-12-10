@@ -10,7 +10,7 @@ const Login = () => {
     body.append("username", form.username);
     body.append("password", form.password);
 
-    const res = await fetch("http://127.0.0.1:8000/token", {
+    const res = await fetch("https://inventory-management-ero4.onrender.com/token", {
       method: "POST",
       body,
     });

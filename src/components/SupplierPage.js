@@ -13,7 +13,7 @@ const SupplierPage = () => {
   const [edit, setEdit] = useState(null);
 
   const loadSuppliers = async () => {
-    const res = await secureFetch("http://127.0.0.1:8000/supplier");
+    const res = await secureFetch("https://inventory-management-ero4.onrender.com/supplier");
     const data = await res.json();
     setSuppliers(data.data || []);
   };
@@ -28,7 +28,7 @@ const SupplierPage = () => {
 
   const addSupplier = async (e) => {
     e.preventDefault();
-    const res = await secureFetch("http://127.0.0.1:8000/supplier", {
+    const res = await secureFetch("https://inventory-management-ero4.onrender.com/supplier", {
       method: "POST",
       body: JSON.stringify(form),
     });
@@ -42,7 +42,7 @@ const SupplierPage = () => {
 
   const updateSupplier = async (e) => {
     e.preventDefault();
-    const res = await secureFetch(`http://127.0.0.1:8000/supplier/${edit.id}`, {
+    const res = await secureFetch(`https://inventory-management-ero4.onrender.com/supplier/${edit.id}`, {
       method: "PUT",
       body: JSON.stringify(edit),
     });
@@ -57,7 +57,7 @@ const SupplierPage = () => {
   const deleteSupplier = async (id) => {
     if (!window.confirm("Delete this supplier?")) return;
 
-    const res = await secureFetch(`http://127.0.0.1:8000/supplier/${id}`, {
+    const res = await secureFetch(`https://inventory-management-ero4.onrender.com/supplier/${id}`, {
       method: "DELETE",
     });
 

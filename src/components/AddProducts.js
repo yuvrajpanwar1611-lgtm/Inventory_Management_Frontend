@@ -33,7 +33,7 @@ const AddProducts = () => {
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`http://127.0.0.1:8000/product/${info.Supplier}`, {
+    const res = await fetch(`https://inventory-management-ero4.onrender.com/product/${info.Supplier}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

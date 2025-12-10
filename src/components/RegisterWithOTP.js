@@ -8,13 +8,13 @@ const RegisterWithOTP = () => {
   const [verified, setVerified] = useState(false);
 
   const sendOTP = async () => {
-    await axios.post("http://localhost:8000/send-otp", { mobile });
+    await axios.post("https://inventory-management-ero4.onrender.com/send-otp", { mobile });
     alert("OTP sent (Static OTP is 123456)");
     setOtpSent(true);
   };
 
   const verifyOTP = async () => {
-    const res = await axios.post("http://localhost:8000/verify-otp", {
+    const res = await axios.post("https://inventory-management-ero4.onrender.com/verify-otp", {
       mobile,
       otp
     });

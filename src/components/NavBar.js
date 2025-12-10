@@ -11,7 +11,7 @@ const NavBar = () => {
     if (!token) return;
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/users/me", {
+      const res = await fetch("https://inventory-management-ero4.onrender.com/users/me", {
         headers: {
           Authorization: "Bearer " + token,
         },

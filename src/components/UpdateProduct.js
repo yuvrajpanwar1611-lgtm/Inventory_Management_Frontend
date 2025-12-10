@@ -28,7 +28,7 @@ const UpdateProduct = () => {
     };
 
     const res = await secureFetch(
-      `http://127.0.0.1:8000/product/${info.ProductId}`,
+      `https://inventory-management-ero4.onrender.com/product/${info.ProductId}`,
       {
         method: "PUT",
         body: JSON.stringify(payload),

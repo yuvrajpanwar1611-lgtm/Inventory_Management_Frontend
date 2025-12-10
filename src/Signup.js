@@ -25,7 +25,7 @@ const Signup = () => {
   const sendEmailOtp = async () => {
     if (!form.email) return alert("Enter email");
 
-    const res = await fetch("https://inventory-management-ero4.onrender.com/-email-otp", {
+    const res = await fetch("https://inventory-management-ero4.onrender.com/send-email-otp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: form.email }),

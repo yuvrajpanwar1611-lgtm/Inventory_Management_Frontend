@@ -25,3 +25,6 @@ export function useSecureFetch() {
     return res;
   };
 }
+
+// Support both default and named imports across the app
+export default useSecureFetch;

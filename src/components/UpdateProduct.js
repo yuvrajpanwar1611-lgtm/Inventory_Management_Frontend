@@ -34,7 +34,8 @@ const UpdateProduct = () => {
       revenue: Number(info.Revenue),
       profit_per_piece: Number(info.ProfitPerPiece),
     };
-
+    
+    const secureFetch = useSecureFetch();
     const res = await secureFetch(
       `https://inventory-management-ero4.onrender.com/product/${info.ProductId}`,
       {

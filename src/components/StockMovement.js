@@ -18,6 +18,7 @@ const StockMovement = () => {
 
   // Load all movements
   const loadMovements = async () => {
+    const secureFetch = useSecureFetch();
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/movements");
     const data = await res.json();
     setMovements(data.data || []);
@@ -26,6 +27,7 @@ const StockMovement = () => {
 
   // Load products for dropdown
   const loadProducts = async () => {
+    const secureFetch = useSecureFetch();
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const data = await res.json();
     setProducts(data.data || []);

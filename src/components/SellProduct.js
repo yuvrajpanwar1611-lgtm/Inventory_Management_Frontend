@@ -21,6 +21,7 @@ const SellProduct = () => {
   }, []);
 
   const loadProducts = async () => {
+    const secureFetch = useSecureFetch();
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const data = await res.json();
     setProducts(data.data || []);

@@ -74,28 +74,32 @@ const NavBar = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    if (!token) return;
+
     const fetchUser = async () => {
-      if (!token) return;
       try {
-        const res = await fetch("https://inventory-management-ero4.onrender.com/users/me", {
-          headers: { Authorization: "Bearer " + token },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-        } else {
-          // don't auto-logout here — let secureFetch handle it if needed
-          console.warn("Failed to fetch user", res.status);
+        const secureFetch = useSecureFetch();
+        const res = await fetch(
+          "https://inventory-management-ero4.onrender.com/users/me",
+          {
+            headers: { Authorization: "Bearer " + token },
+          }
+        );
+
+        if (!res.ok) {
+          console.warn("Failed to fetch user:", res.status);
+          return;
         }
+
+        const data = await res.json();
+        setUser(data);
       } catch (err) {
         console.error("User fetch failed:", err);
       }
     };
 
-    // small delay to ensure token has been set when login just happened
-    const t = setTimeout(fetchUser, 150);
-    return () => clearTimeout(t);
-  }, [token]);
+    setTimeout(fetchUser, 200);
+  }, [token]); // 🔥 If token changes, user is re-fetched instantly
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-3">
@@ -113,7 +117,7 @@ const NavBar = () => {
 
         {user && (
           <span className="fw-bold">
-            👤 {user.full_name?.trim() ? user.full_name : user.username}
+            👤 {user.full_name || user.username}
           </span>
         )}
 
@@ -126,4 +130,3 @@ const NavBar = () => {
 };
 
 export default NavBar;
-

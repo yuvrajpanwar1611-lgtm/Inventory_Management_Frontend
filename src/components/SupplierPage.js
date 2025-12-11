@@ -13,6 +13,7 @@ const SupplierPage = () => {
   const [edit, setEdit] = useState(null);
 
   const loadSuppliers = async () => {
+    const secureFetch = useSecureFetch();
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/supplier");
     const data = await res.json();
     setSuppliers(data.data || []);
@@ -28,6 +29,7 @@ const SupplierPage = () => {
 
   const addSupplier = async (e) => {
     e.preventDefault();
+    const secureFetch = useSecureFetch();
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/supplier", {
       method: "POST",
       body: JSON.stringify(form),
@@ -42,6 +44,7 @@ const SupplierPage = () => {
 
   const updateSupplier = async (e) => {
     e.preventDefault();
+    const secureFetch = useSecureFetch();
     const res = await secureFetch(`https://inventory-management-ero4.onrender.com/supplier/${edit.id}`, {
       method: "PUT",
       body: JSON.stringify(edit),

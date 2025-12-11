@@ -69,7 +69,8 @@ const Login = () => {
     const body = new URLSearchParams();
     body.append("username", form.username);
     body.append("password", form.password);
-
+ 
+    const secureFetch = useSecureFetch();
     const res = await fetch("https://inventory-management-ero4.onrender.com/token", {
       method: "POST",
       body,

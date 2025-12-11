@@ -1,22 +1,25 @@
-// src/secureFetch.js
-export default async function secureFetch(url, options = {}) {
-  const token = localStorage.getItem("token");
+import { AuthContext } from "./AuthContext";
+import { useContext } from "react";
 
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
+// Hook version so components always get the fresh token
+export function useSecureFetch() {
+  const { token, logout } = useContext(AuthContext);
+
+  return async (url, options = {}) => {
+    const headers = {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    };
+
+    if (token) headers.Authorization = "Bearer " + token;
+
+    const res = await fetch(url, { ...options, headers });
+
+    if (res.status === 401) {
+      alert("Session expired. Please login again.");
+      logout();
+    }
+
+    return res;
   };
-
-  if (token) headers.Authorization = "Bearer " + token;
-
-  const res = await fetch(url, { ...options, headers });
-
-  if (res.status === 401) {
-    // token invalid/expired -> clear and redirect to login
-    localStorage.removeItem("token");
-    alert("Session expired. Please login again.");
-    window.location.href = "/login";
-  }
-
-  return res;
 }

@@ -54,7 +54,8 @@ const PurchaseProduct = () => {
       quantity: Number(form.quantity),
       buy_price: Number(form.buy_price),
     };
-
+    
+    const secureFetch = useSecureFetch();
     const res = await secureFetch(
       `https://inventory-management-ero4.onrender.com/product/purchase/${form.productId}`,
       {

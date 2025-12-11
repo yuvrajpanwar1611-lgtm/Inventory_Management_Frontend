@@ -31,7 +31,7 @@ const AddProducts = () => {
     };
 
     const token = localStorage.getItem("token");
-
+    const secureFetch = useSecureFetch();
     const res = await fetch(
       `https://inventory-management-ero4.onrender.com/product/${info.Supplier}`,
       {

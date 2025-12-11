@@ -41,6 +41,7 @@ const RegisterWithOTP = () => {
     setLoading(true);
 
     try {
+      const secureFetch = useSecureFetch();
       const res = await axios.post(
         "https://inventory-management-ero4.onrender.com/verify-otp",
         { mobile, otp: Number(otp) }

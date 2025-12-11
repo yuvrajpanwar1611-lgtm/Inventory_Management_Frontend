@@ -17,7 +17,9 @@ async function secureFetch(url, options = {}) {
 
   if (token) headers.Authorization = "Bearer " + token;
 
-  const res = await fetch(url, { ...options, headers });
+  const secureFetch = useSecureFetch();
+  const res = await secureFetch(url);
+
 
   if (res.status === 401) {
     if (token) {
@@ -45,6 +47,7 @@ const ProductsTable = () => {
 
   // ---------------- FETCH PRODUCTS ----------------
   const fetchProducts = async () => {
+    const secureFetch = useSecureFetch();
     const res = await secureFetch(
       "https://inventory-management-ero4.onrender.com/product"
     );
@@ -74,7 +77,7 @@ const ProductsTable = () => {
   // ---------------- DELETE HANDLER ----------------
   const handleDelete = async (p) => {
     if (!window.confirm("Delete this product?")) return;
-
+    const secureFetch = useSecureFetch();
     const res = await secureFetch(
       `https://inventory-management-ero4.onrender.com/product/${p.id}`,
       { method: "DELETE" }
@@ -99,6 +102,7 @@ const ProductsTable = () => {
     setSupplierModalOpen(true);
 
     try {
+      const secureFetch = useSecureFetch();
       const res = await secureFetch(
         `https://inventory-management-ero4.onrender.com/supplier/${supplierId}`
       );

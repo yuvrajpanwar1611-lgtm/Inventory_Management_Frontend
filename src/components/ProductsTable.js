@@ -5,34 +5,7 @@ import { UpdateProductContext } from "../UpdateProductContext";
 import ProductRow from "./ProductRow";
 import SupplierModal from "./SupplierModal";
 import { useNavigate } from "react-router-dom";
-
-/* ---------------- SECURE FETCH (outside component, NO export!) --------------- */
-async function secureFetch(url, options = {}) {
-  const token = localStorage.getItem("token");
-
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {})
-  };
-
-  if (token) headers.Authorization = "Bearer " + token;
-
-  const secureFetch = useSecureFetch();
-  const res = await secureFetch(url);
-
-
-  if (res.status === 401) {
-    if (token) {
-      alert("Session expired. Please login again.");
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-  }
-
-  return res;
-}
-
-/* ----------------------------------------------------------------------------- */
+import useSecureFetch from "../useSecureFetch"; // IMPORTANT
 
 const ProductsTable = () => {
   const [products, setProducts] = useContext(ProductContext);
@@ -43,16 +16,18 @@ const ProductsTable = () => {
   const [supplierLoading, setSupplierLoading] = useState(false);
   const [supplierData, setSupplierData] = useState(null);
 
+  const secureFetch = useSecureFetch();  // ✅ Correct usage
   const navigate = useNavigate();
 
-  // ---------------- FETCH PRODUCTS ----------------
+  /* ---------------- FETCH PRODUCTS ---------------- */
   const fetchProducts = async () => {
-    const secureFetch = useSecureFetch();
     const res = await secureFetch(
       "https://inventory-management-ero4.onrender.com/product"
     );
-    const data = await res.json();
 
+    if (!res.ok) return;
+
+    const data = await res.json();
     setProducts({ data: data.data || [] });
   };
 
@@ -60,7 +35,7 @@ const ProductsTable = () => {
     fetchProducts();
   }, []);
 
-  // ---------------- EDIT HANDLER ----------------
+  /* ---------------- EDIT HANDLER ---------------- */
   const handleEdit = (p) => {
     setUpdateProductInfo({
       ProductId: p.id,
@@ -74,10 +49,10 @@ const ProductsTable = () => {
     navigate("/updateproduct");
   };
 
-  // ---------------- DELETE HANDLER ----------------
+  /* ---------------- DELETE HANDLER ---------------- */
   const handleDelete = async (p) => {
     if (!window.confirm("Delete this product?")) return;
-    const secureFetch = useSecureFetch();
+
     const res = await secureFetch(
       `https://inventory-management-ero4.onrender.com/product/${p.id}`,
       { method: "DELETE" }
@@ -91,24 +66,24 @@ const ProductsTable = () => {
     }
   };
 
-  // ---------------- VIEW SUPPLIER ----------------
+  /* ---------------- VIEW SUPPLIER ---------------- */
   const handleViewSupplier = async (supplierId) => {
     if (!supplierId) {
       alert("No supplier linked to this product.");
       return;
     }
 
-    setSupplierLoading(true);
     setSupplierModalOpen(true);
+    setSupplierLoading(true);
 
     try {
-      const secureFetch = useSecureFetch();
       const res = await secureFetch(
         `https://inventory-management-ero4.onrender.com/supplier/${supplierId}`
       );
+
       const json = await res.json();
-      setSupplierData(json.data ?? null);
-    } catch {
+      setSupplierData(json.data || null);
+    } catch (err) {
       alert("Failed to load supplier details");
       setSupplierModalOpen(false);
     }

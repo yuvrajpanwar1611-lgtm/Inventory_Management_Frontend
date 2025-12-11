@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useSecureFetch } from "./useSecureFetch";
 
 const Signup = () => {
   const BASE_URL = "https://inventory-management-ero4.onrender.com";
+  const secureFetch = useSecureFetch();
 
   const [form, setForm] = useState({
     username: "",
@@ -26,10 +28,9 @@ const Signup = () => {
   // ----------------------------------------------------
   const sendEmailOtp = async () => {
     if (!form.email) return alert("Enter email");
-    const secureFetch = useSecureFetch();
-    const res = await fetch(`${BASE_URL}/send-email-otp`, {
+
+    const res = await secureFetch(`${BASE_URL}/send-email-otp`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: form.email }),
     });
 
@@ -42,18 +43,19 @@ const Signup = () => {
   // VERIFY EMAIL OTP
   // ----------------------------------------------------
   const verifyEmailOtp = async () => {
-    const secureFetch = useSecureFetch();
-    const res = await fetch(`${BASE_URL}/verify-email-otp`, {
+    const res = await secureFetch(`${BASE_URL}/verify-email-otp`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: form.email, otp: emailOtp }),
     });
 
     const data = await res.json();
+
     if (data.verified) {
       setEmailVerified(true);
-      alert("Email Verified");
-    } else alert("Invalid OTP");
+      alert("Email Verified!");
+    } else {
+      alert("Invalid OTP");
+    }
   };
 
   // ----------------------------------------------------
@@ -62,11 +64,8 @@ const Signup = () => {
   const sendPhoneOtp = async () => {
     if (!form.phone) return alert("Enter phone");
 
-    const secureFetch = useSecureFetch();
-    const secureFetch = useSecureFetch();
-    const res = await fetch(`${BASE_URL}/send-otp`, {
+    const res = await secureFetch(`${BASE_URL}/send-otp`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile: form.phone }),
     });
 
@@ -79,18 +78,19 @@ const Signup = () => {
   // VERIFY PHONE OTP
   // ----------------------------------------------------
   const verifyPhoneOtp = async () => {
-    const secureFetch = useSecureFetch();
-    const res = await fetch(`${BASE_URL}/verify-otp`, {
+    const res = await secureFetch(`${BASE_URL}/verify-otp`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile: form.phone, otp: phoneOtp }),
     });
 
     const data = await res.json();
+
     if (data.verified) {
       setPhoneVerified(true);
-      alert("Phone Verified");
-    } else alert("Invalid OTP");
+      alert("Phone Verified!");
+    } else {
+      alert("Invalid OTP");
+    }
   };
 
   // ----------------------------------------------------
@@ -98,14 +98,14 @@ const Signup = () => {
   // ----------------------------------------------------
   const submit = async (e) => {
     e.preventDefault();
+
     if (!emailVerified) return alert("Verify email first");
     if (!phoneVerified) return alert("Verify phone first");
 
     setLoading(true);
-    const secureFetch = useSecureFetch();
-    const res = await fetch(`${BASE_URL}/signup`, {
+
+    const res = await secureFetch(`${BASE_URL}/signup`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
 
@@ -123,34 +123,25 @@ const Signup = () => {
       className="d-flex justify-content-center align-items-center"
       style={{ minHeight: "100vh", background: "#f3f6fb" }}
     >
-      <div
-        className="card p-4 shadow-sm"
-        style={{
-          width: "350px",
-          borderRadius: "14px",
-          background: "white",
-        }}
-      >
+      <div className="card p-4 shadow-sm" style={{ width: "350px", borderRadius: "14px" }}>
         <h3 className="text-center mb-3 fw-bold">Create Account</h3>
 
         <form onSubmit={submit}>
           {/* Username */}
-          <div className="mb-3">
-            <input
-              className="form-control"
-              placeholder="Username"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              required
-            />
-          </div>
+          <input
+            className="form-control mb-3"
+            placeholder="Username"
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            required
+          />
 
           {/* Email + OTP */}
           <div className="mb-3">
             <div className="input-group">
               <input
-                type="email"
                 className="form-control"
+                type="email"
                 placeholder="Email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -170,13 +161,13 @@ const Signup = () => {
               <div className="input-group mt-2">
                 <input
                   className="form-control"
-                  placeholder="Enter Email OTP"
+                  placeholder="Email OTP"
                   value={emailOtp}
                   onChange={(e) => setEmailOtp(e.target.value)}
                 />
                 <button
-                  className="btn btn-success btn-sm"
                   type="button"
+                  className="btn btn-success btn-sm"
                   onClick={verifyEmailOtp}
                 >
                   ✔
@@ -185,9 +176,7 @@ const Signup = () => {
             )}
 
             {emailVerified && (
-              <div className="alert alert-success py-1 mt-2 text-center">
-                Email Verified
-              </div>
+              <div className="alert alert-success py-1 mt-2 text-center">Email Verified</div>
             )}
           </div>
 
@@ -201,6 +190,7 @@ const Signup = () => {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 required
               />
+
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
@@ -215,24 +205,18 @@ const Signup = () => {
               <div className="input-group mt-2">
                 <input
                   className="form-control"
-                  placeholder="Enter Phone OTP"
+                  placeholder="Phone OTP"
                   value={phoneOtp}
                   onChange={(e) => setPhoneOtp(e.target.value)}
                 />
-                <button
-                  type="button"
-                  className="btn btn-success btn-sm"
-                  onClick={verifyPhoneOtp}
-                >
+                <button className="btn btn-success btn-sm" type="button" onClick={verifyPhoneOtp}>
                   ✔
                 </button>
               </div>
             )}
 
             {phoneVerified && (
-              <div className="alert alert-success py-1 mt-2 text-center">
-                Phone Verified
-              </div>
+              <div className="alert alert-success py-1 mt-2 text-center">Phone Verified</div>
             )}
           </div>
 
@@ -246,17 +230,14 @@ const Signup = () => {
 
           <input
             className="form-control mb-3"
-            placeholder="Password"
             type="password"
+            placeholder="Password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
 
-          <button
-            className="btn btn-primary w-100 fw-bold"
-            disabled={loading || !emailVerified || !phoneVerified}
-          >
+          <button className="btn btn-primary w-100 fw-bold" disabled={loading}>
             {loading ? "Creating..." : "Signup"}
           </button>
         </form>
@@ -272,5 +253,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-

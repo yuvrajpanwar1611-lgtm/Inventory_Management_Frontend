@@ -69,21 +69,29 @@ const Login = () => {
     const body = new URLSearchParams();
     body.append("username", form.username);
     body.append("password", form.password);
- 
-    const secureFetch = useSecureFetch();
-    const res = await fetch("https://inventory-management-ero4.onrender.com/token", {
-      method: "POST",
-      body,
-    });
 
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        "https://inventory-management-ero4.onrender.com/token",
+        {
+          method: "POST",
+          body,
+        }
+      );
 
-    if (!res.ok) {
-      return alert(data.detail || "Login failed");
+      const data = await res.json();
+
+      if (!res.ok) {
+        return alert(data.detail || "Login failed");
+      }
+
+      // Store token + redirect using AuthContext
+      login(data.access_token);
+
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Failed to login. Check network or server.");
     }
-
-    // use context login — it stores token and redirects after state updates
-    login(data.access_token);
   };
 
   return (
@@ -95,9 +103,11 @@ const Login = () => {
           <input
             className="form-control mb-3"
             placeholder="Username"
-            value={form.username}
             name="username"
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            value={form.username}
+            onChange={(e) =>
+              setForm({ ...form, username: e.target.value })
+            }
             required
           />
 
@@ -105,9 +115,11 @@ const Login = () => {
             className="form-control mb-3"
             type="password"
             placeholder="Password"
-            value={form.password}
             name="password"
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            value={form.password}
+            onChange={(e) =>
+              setForm({ ...form, password: e.target.value })
+            }
             required
           />
 
@@ -123,5 +135,3 @@ const Login = () => {
 };
 
 export default Login;
-
-

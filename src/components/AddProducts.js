@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+// src/components/AddProducts.js
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../AuthContext";
+import useSecureFetch from "../useSecureFetch";
 
 const AddProducts = () => {
   const [info, setInfo] = useState({
@@ -8,11 +11,15 @@ const AddProducts = () => {
     ProfitPerPiece: "",
   });
 
+  const { token } = useContext(AuthContext);
+  const secureFetch = useSecureFetch();
+
+  // Redirect if not logged in
   useEffect(() => {
-    if (!localStorage.getItem("token")) {
+    if (!token) {
       window.location.href = "/login";
     }
-  }, []);
+  }, [token]);
 
   const handleChange = (e) => {
     setInfo({ ...info, [e.target.name]: e.target.value });
@@ -30,39 +37,28 @@ const AddProducts = () => {
       profit_per_piece: Number(info.ProfitPerPiece),
     };
 
-    const token = localStorage.getItem("token");
-    const secureFetch = useSecureFetch();
-    const res = await fetch(
+    const res = await secureFetch(
       `https://inventory-management-ero4.onrender.com/product/${info.Supplier}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
         body: JSON.stringify(payload),
       }
     );
 
-    if (res.status === 401) {
-      alert("Session expired. Please login again.");
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+    if (!res.ok) {
+      const error = await res.json();
+      alert(error.detail || "Failed to add product");
       return;
     }
 
-    if (res.ok) {
-      alert("Product added!");
-      setInfo({
-        Supplier: "",
-        ProductName: "",
-        UnitPrice: "",
-        ProfitPerPiece: "",
-      });
-    } else {
-      const error = await res.json();
-      alert(error.detail || "Failed to add product");
-    }
+    alert("Product added successfully!");
+
+    setInfo({
+      Supplier: "",
+      ProductName: "",
+      UnitPrice: "",
+      ProfitPerPiece: "",
+    });
   };
 
   return (
@@ -72,7 +68,7 @@ const AddProducts = () => {
           <h3 className="card-title mb-3">Add Product</h3>
 
           <form onSubmit={postData}>
-
+            {/* Supplier Field */}
             <div className="mb-3">
               <label className="form-label">Supplier ID</label>
               <input
@@ -85,6 +81,7 @@ const AddProducts = () => {
               />
             </div>
 
+            {/* Product Name */}
             <div className="mb-3">
               <label className="form-label">Product Name</label>
               <input
@@ -97,6 +94,7 @@ const AddProducts = () => {
               />
             </div>
 
+            {/* Unit Price */}
             <div className="mb-3">
               <label className="form-label">Unit Price</label>
               <input
@@ -110,6 +108,7 @@ const AddProducts = () => {
               />
             </div>
 
+            {/* Profit Per Piece */}
             <div className="mb-3">
               <label className="form-label">Profit Per Piece</label>
               <input

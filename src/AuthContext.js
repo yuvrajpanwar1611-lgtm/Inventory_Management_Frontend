@@ -6,52 +6,74 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
     try {
-      return localStorage.getItem("token");
+      return localStorage.getItem("token") || null;
     } catch {
       return null;
     }
   });
 
-  // Parses JWT expiry if needed (not required for current flow but handy)
+  /* -----------------------------------------------------
+      OPTIONAL — Decode JWT for expiry check
+  ------------------------------------------------------ */
   const parseJwt = (t) => {
     try {
-      const payload = JSON.parse(atob(t.split(".")[1]));
-      return payload;
+      return JSON.parse(atob(t.split(".")[1]));
     } catch {
       return null;
     }
   };
 
+  /* -----------------------------------------------------
+      CHECK TOKEN EXPIRY ONLY ON FIRST LOAD
+      (NO auto logout loops — safe)
+  ------------------------------------------------------ */
   useEffect(() => {
-    // optional: check expiry on mount and clear if expired
-    if (token) {
-      const payload = parseJwt(token);
-      if (payload && payload.exp) {
-        const expMs = payload.exp * 1000;
-        if (Date.now() > expMs) {
-          // token expired -> clear
-          localStorage.removeItem("token");
-          setToken(null);
-        }
+    if (!token) return;
+
+    const payload = parseJwt(token);
+    if (payload?.exp) {
+      const expMs = payload.exp * 1000;
+      if (Date.now() > expMs) {
+        console.warn("Token expired — clearing locally.");
+        localStorage.removeItem("token");
+        setToken(null);
       }
     }
-  }, []);
+  }, []); // runs only on mount
 
+  /* -----------------------------------------------------
+      LOGIN — Save token + update React + redirect
+  ------------------------------------------------------ */
   const login = (newToken) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
 
-    // small timeout ensures React updates consumers before navigation
     setTimeout(() => {
       window.location.href = "/";
-    }, 50);
+    }, 80);
   };
 
+  /* -----------------------------------------------------
+      LOGOUT — Clear token + redirect to login
+  ------------------------------------------------------ */
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
     window.location.href = "/login";
   };
+
+  /* -----------------------------------------------------
+      SYNC TOKEN ACROSS ALL TABS
+  ------------------------------------------------------ */
+  useEffect(() => {
+    const onStorage = () => {
+      const updated = localStorage.getItem("token");
+      setToken(updated);
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ token, login, logout }}>
@@ -59,3 +81,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

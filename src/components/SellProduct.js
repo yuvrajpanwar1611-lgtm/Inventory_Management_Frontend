@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import secureFetch from "../secureFetch";
+import useSecureFetch from "../useSecureFetch"; // ✅ CORRECT HOOK IMPORT
 
 const SellProduct = () => {
+  const secureFetch = useSecureFetch(); // ✅ HOOK CALLED ONCE AT TOP
+
   const [products, setProducts] = useState([]);
   const [rows, setRows] = useState([
     { id: Date.now(), product_id: "", qty: 1, sell_price: "", name: "", max_stock: 0 }
@@ -16,17 +18,20 @@ const SellProduct = () => {
   const [loading, setLoading] = useState(false);
   const [invoiceUrl, setInvoiceUrl] = useState(null);
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
+  /* ---------------------- LOAD PRODUCTS ---------------------- */
   const loadProducts = async () => {
-    const secureFetch = useSecureFetch();
-    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
+    const res = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/product"
+    );
     const data = await res.json();
     setProducts(data.data || []);
   };
 
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  /* ---------------------- ROW OPERATIONS ---------------------- */
   const addRow = () => {
     setRows(prev => [
       ...prev,
@@ -62,27 +67,31 @@ const SellProduct = () => {
     setRows(prev => prev.map(r => (r.id === rowId ? { ...r, [key]: value } : r)));
   };
 
-  const lineTotal = (r) => Number(r.qty || 0) * Number(r.sell_price || 0);
+  const lineTotal = (r) =>
+    Number(r.qty || 0) * Number(r.sell_price || 0);
 
-  const grandTotal = () => rows.reduce((sum, r) => sum + lineTotal(r), 0);
+  const grandTotal = () =>
+    rows.reduce((sum, r) => sum + lineTotal(r), 0);
 
+  /* ---------------------- SELL ACTION ---------------------- */
   const handleSell = async (e) => {
     e.preventDefault();
     setInvoiceUrl(null);
 
+    // Validate rows
     for (const row of rows) {
       if (!row.product_id) return alert("Select product in all rows");
-      if (Number(row.qty) <= 0) return alert("Quantity must be > 0");
+      if (row.qty <= 0) return alert("Quantity must be > 0");
 
-      if (Number(row.qty) > Number(row.max_stock)) {
+      if (row.qty > row.max_stock) {
         const ok = window.confirm(`${row.name} has only ${row.max_stock} left. Continue?`);
         if (!ok) return;
       }
     }
 
-    if (!customer.customerName || !customer.customerPhone || !customer.customerEmail) {
-      return alert("Fill customer details");
-    }
+    // Validate customer
+    if (!customer.customerName || !customer.customerPhone || !customer.customerEmail)
+      return alert("Fill all customer details");
 
     const payload = {
       items: rows.map(r => ({
@@ -97,26 +106,36 @@ const SellProduct = () => {
 
     setLoading(true);
 
-    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product/sell", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+    const res = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/product/sell",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
 
     const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) return alert(data.detail || "Sell failed");
+    if (!res.ok) {
+      alert(data.detail || "Sell failed");
+      return;
+    }
 
     alert("Sale completed!");
 
     setInvoiceUrl("https://inventory-management-ero4.onrender.com" + data.invoice_pdf);
 
-    setRows([{ id: Date.now(), product_id: "", qty: 1, sell_price: "", name: "", max_stock: 0 }]);
+    // Reset form
+    setRows([
+      { id: Date.now(), product_id: "", qty: 1, sell_price: "", name: "", max_stock: 0 }
+    ]);
     setCustomer({ customerName: "", customerPhone: "", customerEmail: "" });
 
     loadProducts();
   };
 
+  /* ---------------------- UI ---------------------- */
   return (
     <div className="container mt-4">
       <div className="card shadow-sm">
@@ -129,8 +148,6 @@ const SellProduct = () => {
                 
                 {/* PRODUCT SELECT */}
                 <select
-                  id={`product-${row.id}`}
-                  name="product_id"
                   className="form-control"
                   style={{ flex: 3 }}
                   value={row.product_id}
@@ -146,10 +163,8 @@ const SellProduct = () => {
 
                 {/* QTY */}
                 <input
-                  id={`qty-${row.id}`}
-                  name="qty"
-                  className="form-control"
                   type="number"
+                  className="form-control"
                   style={{ width: "100px" }}
                   value={row.qty}
                   onChange={(e) => onRowChange(row.id, "qty", e.target.value)}
@@ -157,12 +172,9 @@ const SellProduct = () => {
 
                 {/* SELL PRICE */}
                 <input
-                  id={`sell_price-${row.id}`}
-                  name="sell_price"
-                  className="form-control"
                   type="number"
+                  className="form-control"
                   style={{ width: "140px" }}
-                  step="0.01"
                   value={row.sell_price}
                   onChange={(e) => onRowChange(row.id, "sell_price", e.target.value)}
                 />
@@ -191,8 +203,6 @@ const SellProduct = () => {
             <h5>Customer Info</h5>
 
             <input
-              id="customerName"
-              name="customerName"
               className="form-control mb-2"
               placeholder="Customer Name"
               value={customer.customerName}
@@ -200,8 +210,6 @@ const SellProduct = () => {
             />
 
             <input
-              id="customerPhone"
-              name="customerPhone"
               className="form-control mb-2"
               placeholder="Phone"
               value={customer.customerPhone}
@@ -209,8 +217,6 @@ const SellProduct = () => {
             />
 
             <input
-              id="customerEmail"
-              name="customerEmail"
               className="form-control mb-3"
               placeholder="Email"
               value={customer.customerEmail}
@@ -229,7 +235,7 @@ const SellProduct = () => {
 
           {invoiceUrl && (
             <div className="alert alert-success mt-3">
-              <h5>Invoice ready</h5>
+              <h5>Invoice Ready</h5>
               <a href={invoiceUrl} target="_blank" className="btn btn-success">
                 Download Invoice
               </a>

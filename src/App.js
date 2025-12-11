@@ -122,7 +122,9 @@
 //   );
 // }
 
-import React, { useEffect, useState, useContext } from "react";
+// src/App.js
+// src/App.js
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -150,26 +152,26 @@ import { SupplierContextProvider } from "./SupplierContext";
 import { UpdateProductContextProvider } from "./UpdateProductContext";
 
 
-/* ----------------------- Layout Component ------------------------ */
+// ====================== LAYOUT ========================= //
 
 function Layout() {
   const location = useLocation();
-  const { token } = useContext(AuthContext); // read token from context
+  const { token } = React.useContext(AuthContext);
 
-  // Hide Navbar ONLY on login/signup pages
+  // Hide Navbar & ChatBot ONLY on Login + Signup
   const hideUI = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>
-      {/* ✅ NAVBAR ALWAYS SHOWS (except login/signup pages) */}
+      {/* Navbar visible when NOT on login/signup */}
       {!hideUI && <NavBar />}
 
       <Routes>
-        {/* ---------- Public Routes ---------- */}
+        {/* ---------- PUBLIC ROUTES ---------- */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* ---------- Protected Routes ---------- */}
+        {/* ---------- PROTECTED ROUTES ---------- */}
         <Route
           path="/"
           element={
@@ -234,14 +236,14 @@ function Layout() {
         />
       </Routes>
 
-      {/* Show chatbot ONLY when user is logged in */}
+      {/* ChatBot only when logged in */}
       {!hideUI && token && <ChatBot />}
     </>
   );
 }
 
 
-/* ----------------------- App Wrapper ------------------------ */
+// ====================== APP WRAPPER ========================= //
 
 function App() {
   return (
@@ -260,4 +262,5 @@ function App() {
 }
 
 export default App;
+
 

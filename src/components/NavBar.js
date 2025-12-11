@@ -63,10 +63,12 @@
 
 // export default NavBar;
 // src/components/NavBar.js
+// src/components/NavBar.js
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
 import { AuthContext } from "../AuthContext";
+import secureFetch from "../secureFetch"; // ✅ FIX: import secureFetch
 
 const NavBar = () => {
   const [products] = useContext(ProductContext);
@@ -74,16 +76,15 @@ const NavBar = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setUser(null);
+      return;
+    }
 
     const fetchUser = async () => {
       try {
-        const secureFetch = useSecureFetch();
-        const res = await fetch(
-          "https://inventory-management-ero4.onrender.com/users/me",
-          {
-            headers: { Authorization: "Bearer " + token },
-          }
+        const res = await secureFetch(
+          "https://inventory-management-ero4.onrender.com/users/me"
         );
 
         if (!res.ok) {
@@ -98,8 +99,8 @@ const NavBar = () => {
       }
     };
 
-    setTimeout(fetchUser, 200);
-  }, [token]); // 🔥 If token changes, user is re-fetched instantly
+    fetchUser();
+  }, [token]); // 🔥 Re-runs whenever token updates
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-3">
@@ -121,9 +122,11 @@ const NavBar = () => {
           </span>
         )}
 
-        <button className="btn btn-light btn-sm" onClick={logout}>
-          Logout
-        </button>
+        {token && (
+          <button className="btn btn-light btn-sm" onClick={logout}>
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );

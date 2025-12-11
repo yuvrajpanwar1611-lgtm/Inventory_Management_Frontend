@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import secureFetch from "../secureFetch";
+import useSecureFetch from "../useSecureFetch"; // ✅ CORRECT IMPORT
 
 const StockMovement = () => {
+  const secureFetch = useSecureFetch(); // ✅ HOOK CALLED ONCE
+
   const [movements, setMovements] = useState([]);
   const [filteredMovements, setFilteredMovements] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
 
-  // Safe timestamp handler
+  /* ---------------- SAFE DATE HANDLER ---------------- */
   const safeDate = (ts) => {
     try {
       return new Date(ts).toLocaleString();
@@ -16,19 +18,21 @@ const StockMovement = () => {
     }
   };
 
-  // Load all movements
+  /* ---------------- LOAD MOVEMENTS ---------------- */
   const loadMovements = async () => {
-    const secureFetch = useSecureFetch();
-    const res = await secureFetch("https://inventory-management-ero4.onrender.com/movements");
+    const res = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/movements"
+    );
     const data = await res.json();
     setMovements(data.data || []);
     setFilteredMovements(data.data || []);
   };
 
-  // Load products for dropdown
+  /* ---------------- LOAD PRODUCTS ---------------- */
   const loadProducts = async () => {
-    const secureFetch = useSecureFetch();
-    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
+    const res = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/product"
+    );
     const data = await res.json();
     setProducts(data.data || []);
   };
@@ -38,19 +42,21 @@ const StockMovement = () => {
     loadProducts();
   }, []);
 
-  // Filter movements by product
+  /* ---------------- FILTER HANDLER ---------------- */
   const handleFilter = (productId) => {
     setSelectedProduct(productId);
 
-    if (productId === "") {
+    if (!productId) {
       setFilteredMovements(movements);
-    } else {
-      setFilteredMovements(
-        movements.filter((m) => String(m.product_id) === String(productId))
-      );
+      return;
     }
+
+    setFilteredMovements(
+      movements.filter((m) => String(m.product_id) === String(productId))
+    );
   };
 
+  /* ---------------- UI ---------------- */
   return (
     <div className="container mt-4">
       <h2 className="mb-3">Stock Movement —</h2>
@@ -63,7 +69,6 @@ const StockMovement = () => {
 
         <select
           id="productFilter"
-          name="productFilter"
           className="form-control"
           value={selectedProduct}
           onChange={(e) => handleFilter(e.target.value)}

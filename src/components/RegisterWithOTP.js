@@ -1,47 +1,50 @@
 import React, { useState } from "react";
 import axios from "axios";
+import useSecureFetch from "../useSecureFetch"; // ✅ Correct hook import
 
 const RegisterWithOTP = () => {
+  const secureFetch = useSecureFetch(); // ✅ Hook used correctly at top level
+
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [verified, setVerified] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // ========================
-  // SEND OTP
-  // ========================
+  /* --------------------------------------------------
+     SEND OTP
+  -------------------------------------------------- */
   const sendOTP = async () => {
     if (!mobile || mobile.length < 10)
-      return alert("Enter a valid mobile number");
+      return alert("Enter a valid 10-digit mobile number");
 
     setLoading(true);
 
     try {
-      await axios.post("https://inventory-management-ero4.onrender.com/send-otp", {
-        mobile,
-      });
+      await axios.post(
+        "https://inventory-management-ero4.onrender.com/send-otp",
+        { mobile }
+      );
 
       alert("OTP sent! (Static OTP = 123456)");
       setOtpSent(true);
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       alert("Failed to send OTP");
-      console.error(err);
     }
 
     setLoading(false);
   };
 
-  // ========================
-  // VERIFY OTP
-  // ========================
+  /* --------------------------------------------------
+     VERIFY OTP
+  -------------------------------------------------- */
   const verifyOTP = async () => {
     if (!otp) return alert("Enter OTP");
 
     setLoading(true);
 
     try {
-      const secureFetch = useSecureFetch();
       const res = await axios.post(
         "https://inventory-management-ero4.onrender.com/verify-otp",
         { mobile, otp: Number(otp) }
@@ -53,19 +56,22 @@ const RegisterWithOTP = () => {
       } else {
         alert("❌ Invalid OTP");
       }
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       alert("Verification failed");
-      console.error(err);
     }
 
     setLoading(false);
   };
 
+  /* --------------------------------------------------
+     UI
+  -------------------------------------------------- */
   return (
     <div className="container mt-4" style={{ maxWidth: "400px" }}>
       <h3 className="mb-3 text-center">Mobile OTP Verification</h3>
 
-      {/* MOBILE INPUT */}
+      {/* Mobile Input */}
       <input
         id="mobile"
         name="mobile"
@@ -76,7 +82,7 @@ const RegisterWithOTP = () => {
         required
       />
 
-      {/* SEND OTP BUTTON */}
+      {/* Send OTP Button */}
       {!otpSent && (
         <button
           className="btn btn-primary w-100"
@@ -87,7 +93,7 @@ const RegisterWithOTP = () => {
         </button>
       )}
 
-      {/* OTP INPUT + VERIFY BUTTON */}
+      {/* OTP Input + Verify */}
       {otpSent && !verified && (
         <>
           <input
@@ -110,7 +116,7 @@ const RegisterWithOTP = () => {
         </>
       )}
 
-      {/* SUCCESS MESSAGE */}
+      {/* Success */}
       {verified && (
         <div className="alert alert-success mt-3 text-center">
           ✅ Mobile Verified

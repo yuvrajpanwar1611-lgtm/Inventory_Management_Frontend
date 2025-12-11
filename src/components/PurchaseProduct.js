@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import secureFetch from "../secureFetch";
+import useSecureFetch from "../useSecureFetch"; // ✅ Correct import
 
 const PurchaseProduct = () => {
+  const secureFetch = useSecureFetch(); // ✅ Hook can ONLY be used here
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
 
@@ -14,23 +15,27 @@ const PurchaseProduct = () => {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // ===================== LOAD PRODUCTS + SUPPLIERS =====================
+  /* ---------------- LOAD PRODUCTS + SUPPLIERS ---------------- */
   const loadData = async () => {
-    const prod = await secureFetch("https://inventory-management-ero4.onrender.com/product");
-    const prodData = await prod.json();
+    const prodRes = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/product"
+    );
+    const prodJson = await prodRes.json();
 
-    const sup = await secureFetch("https://inventory-management-ero4.onrender.com/supplier");
-    const supData = await sup.json();
+    const supRes = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/supplier"
+    );
+    const supJson = await supRes.json();
 
-    setProducts(prodData.data || []);
-    setSuppliers(supData.data || []);
+    setProducts(prodJson.data || []);
+    setSuppliers(supJson.data || []);
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // ===================== SELECT PRODUCT =====================
+  /* ---------------- SELECT PRODUCT ---------------- */
   const handleProductSelect = (e) => {
     const pid = Number(e.target.value);
     const product = products.find((p) => p.id === pid);
@@ -45,7 +50,7 @@ const PurchaseProduct = () => {
     });
   };
 
-  // ===================== HANDLE SUBMIT =====================
+  /* ---------------- SUBMIT PURCHASE ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,13 +59,12 @@ const PurchaseProduct = () => {
       quantity: Number(form.quantity),
       buy_price: Number(form.buy_price),
     };
-    
-    const secureFetch = useSecureFetch();
+
     const res = await secureFetch(
       `https://inventory-management-ero4.onrender.com/product/purchase/${form.productId}`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" }, // FIXED
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }
     );
@@ -74,9 +78,11 @@ const PurchaseProduct = () => {
 
     alert("Stock purchased successfully!");
 
-    // reset form
+    // Reset form
     setForm({ productId: "", supplier_id: "", quantity: "", buy_price: "" });
     setSelectedProduct(null);
+
+    loadData();
   };
 
   return (
@@ -87,12 +93,11 @@ const PurchaseProduct = () => {
           <h3 className="mb-3">Purchase Product</h3>
 
           <form onSubmit={handleSubmit}>
-            
+
             {/* PRODUCT DROPDOWN */}
             <div className="mb-3">
               <label className="form-label">Select Product</label>
               <select
-                name="productId"
                 className="form-control"
                 value={form.productId}
                 onChange={handleProductSelect}
@@ -111,12 +116,9 @@ const PurchaseProduct = () => {
             <div className="mb-3">
               <label className="form-label">Select Supplier</label>
               <select
-                name="supplier_id"
                 className="form-control"
                 value={form.supplier_id}
-                onChange={(e) =>
-                  setForm({ ...form, supplier_id: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, supplier_id: e.target.value })}
                 required
               >
                 <option value="">-- Select Supplier --</option>
@@ -134,7 +136,6 @@ const PurchaseProduct = () => {
                 <label className="form-label">Quantity</label>
                 <input
                   type="number"
-                  name="quantity"
                   className="form-control"
                   value={form.quantity}
                   onChange={(e) =>
@@ -148,7 +149,6 @@ const PurchaseProduct = () => {
                 <label className="form-label">Buy Price</label>
                 <input
                   type="number"
-                  name="buy_price"
                   className="form-control"
                   value={form.buy_price}
                   onChange={(e) =>
@@ -160,8 +160,8 @@ const PurchaseProduct = () => {
             </div>
 
             <button className="btn btn-primary w-100">Purchase</button>
-
           </form>
+
         </div>
       </div>
     </div>

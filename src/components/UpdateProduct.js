@@ -1,21 +1,24 @@
+// src/components/UpdateProduct.js
 import React, { useContext, useEffect } from "react";
 import { UpdateProductContext } from "../UpdateProductContext";
-import secureFetch from "../secureFetch";
+import useSecureFetch from "../useSecureFetch";
 
 const UpdateProduct = () => {
   const [info, setInfo] = useContext(UpdateProductContext);
+  const secureFetch = useSecureFetch();
 
-  // Redirect if loaded without selected product
+  /* ---------------------- REDIRECT IF NO PRODUCT ---------------------- */
   useEffect(() => {
     if (!info?.ProductId) {
       window.location.href = "/";
     }
   }, [info]);
 
+  /* ---------------------- FORM FIELD CHANGE --------------------------- */
   const handleChange = (e) => {
     let value = e.target.value;
 
-    // Convert number fields safely
+    // Safe conversion for number inputs
     if (e.target.type === "number") {
       value = value === "" ? "" : Number(value);
     }
@@ -23,6 +26,7 @@ const UpdateProduct = () => {
     setInfo({ ...info, [e.target.name]: value });
   };
 
+  /* ---------------------- SUBMIT UPDATE ---------------------- */
   const updateData = async (e) => {
     e.preventDefault();
 
@@ -34,12 +38,12 @@ const UpdateProduct = () => {
       revenue: Number(info.Revenue),
       profit_per_piece: Number(info.ProfitPerPiece),
     };
-    
-    const secureFetch = useSecureFetch();
+
     const res = await secureFetch(
       `https://inventory-management-ero4.onrender.com/product/${info.ProductId}`,
       {
         method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }
     );
@@ -47,12 +51,12 @@ const UpdateProduct = () => {
     if (res.ok) {
       alert("Product updated successfully!");
     } else {
-      const err = await res.json();
+      const err = await res.json().catch(() => ({}));
       alert(err.detail || "Update failed");
     }
   };
 
-  // Prevent UI render if info not ready
+  /* ---------------------- PREVENT BLANK RENDER ---------------------- */
   if (!info?.ProductId) return null;
 
   return (
@@ -62,6 +66,7 @@ const UpdateProduct = () => {
           <h3 className="card-title mb-3">Update Product</h3>
 
           <form onSubmit={updateData}>
+            {/* NAME */}
             <div className="mb-3">
               <label htmlFor="product-name">Product Name</label>
               <input
@@ -74,6 +79,7 @@ const UpdateProduct = () => {
               />
             </div>
 
+            {/* STOCK & SOLD */}
             <div className="row">
               <div className="col-md-6 mb-3">
                 <label htmlFor="qty-stock">Quantity In Stock</label>
@@ -102,6 +108,7 @@ const UpdateProduct = () => {
               </div>
             </div>
 
+            {/* PRICE & REVENUE */}
             <div className="row">
               <div className="col-md-6 mb-3">
                 <label htmlFor="unit-price">Unit Price</label>
@@ -130,6 +137,7 @@ const UpdateProduct = () => {
               </div>
             </div>
 
+            {/* PROFIT */}
             <div className="mb-3">
               <label htmlFor="profit-piece">Profit Per Piece</label>
               <input

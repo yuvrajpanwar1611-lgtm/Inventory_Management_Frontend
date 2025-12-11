@@ -1,7 +1,10 @@
+// src/components/SupplierPage.js
 import React, { useEffect, useState } from "react";
-import secureFetch from "../secureFetch";
+import useSecureFetch from "../useSecureFetch";
 
 const SupplierPage = () => {
+  const secureFetch = useSecureFetch();
+
   const [suppliers, setSuppliers] = useState([]);
   const [form, setForm] = useState({
     name: "",
@@ -12,9 +15,14 @@ const SupplierPage = () => {
 
   const [edit, setEdit] = useState(null);
 
+  /* -------------------- LOAD SUPPLIERS -------------------- */
   const loadSuppliers = async () => {
-    const secureFetch = useSecureFetch();
-    const res = await secureFetch("https://inventory-management-ero4.onrender.com/supplier");
+    const res = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/supplier"
+    );
+
+    if (!res.ok) return;
+
     const data = await res.json();
     setSuppliers(data.data || []);
   };
@@ -23,46 +31,67 @@ const SupplierPage = () => {
     loadSuppliers();
   }, []);
 
+  /* -------------------- INPUT CHANGE HANDLER -------------------- */
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  /* -------------------- ADD SUPPLIER -------------------- */
   const addSupplier = async (e) => {
     e.preventDefault();
-    const secureFetch = useSecureFetch();
-    const res = await secureFetch("https://inventory-management-ero4.onrender.com/supplier", {
-      method: "POST",
-      body: JSON.stringify(form),
-    });
 
-    if (res.ok) {
-      alert("Supplier added");
-      setForm({ name: "", company: "", email: "", phone: "" });
-      loadSuppliers();
+    const res = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/supplier",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      }
+    );
+
+    if (!res.ok) {
+      alert("Failed to add supplier");
+      return;
     }
+
+    alert("Supplier added");
+    setForm({ name: "", company: "", email: "", phone: "" });
+    loadSuppliers();
   };
 
+  /* -------------------- UPDATE SUPPLIER -------------------- */
   const updateSupplier = async (e) => {
     e.preventDefault();
-    const secureFetch = useSecureFetch();
-    const res = await secureFetch(`https://inventory-management-ero4.onrender.com/supplier/${edit.id}`, {
-      method: "PUT",
-      body: JSON.stringify(edit),
-    });
 
-    if (res.ok) {
-      alert("Supplier updated");
-      setEdit(null);
-      loadSuppliers();
+    const res = await secureFetch(
+      `https://inventory-management-ero4.onrender.com/supplier/${edit.id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(edit),
+      }
+    );
+
+    if (!res.ok) {
+      alert("Failed to update supplier");
+      return;
     }
+
+    alert("Supplier updated");
+    setEdit(null);
+    loadSuppliers();
   };
 
+  /* -------------------- DELETE SUPPLIER -------------------- */
   const deleteSupplier = async (id) => {
     if (!window.confirm("Delete this supplier?")) return;
 
-    const res = await secureFetch(`https://inventory-management-ero4.onrender.com/supplier/${id}`, {
-      method: "DELETE",
-    });
+    const res = await secureFetch(
+      `https://inventory-management-ero4.onrender.com/supplier/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
 
     if (res.ok) {
       alert("Supplier deleted");
@@ -75,14 +104,14 @@ const SupplierPage = () => {
 
       <h2 className="mb-3">Suppliers</h2>
 
-      {/* ADD FORM */}
+      {/* -------------------- ADD SUPPLIER FORM -------------------- */}
       <div className="card shadow-sm mb-4">
         <div className="card-body">
           <h4>Add Supplier</h4>
 
           <form onSubmit={addSupplier}>
             <div className="row">
-              
+
               <div className="col-md-6 mb-3">
                 <label htmlFor="sup-name">Name</label>
                 <input
@@ -111,6 +140,7 @@ const SupplierPage = () => {
                 <label htmlFor="sup-email">Email</label>
                 <input
                   id="sup-email"
+                  type="email"
                   className="form-control"
                   name="email"
                   value={form.email}
@@ -123,6 +153,7 @@ const SupplierPage = () => {
                 <label htmlFor="sup-phone">Phone</label>
                 <input
                   id="sup-phone"
+                  type="tel"
                   className="form-control"
                   name="phone"
                   value={form.phone}
@@ -138,7 +169,7 @@ const SupplierPage = () => {
         </div>
       </div>
 
-      {/* TABLE */}
+      {/* -------------------- SUPPLIER TABLE -------------------- */}
       <div className="table-responsive shadow-sm">
         <table className="table table-bordered table-hover text-center">
           <thead className="table-primary">
@@ -185,7 +216,7 @@ const SupplierPage = () => {
         </table>
       </div>
 
-      {/* EDIT FORM */}
+      {/* -------------------- EDIT SUPPLIER FORM -------------------- */}
       {edit && (
         <div className="card shadow-sm mt-4">
           <div className="card-body">

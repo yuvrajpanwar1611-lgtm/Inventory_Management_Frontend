@@ -122,8 +122,7 @@
 //   );
 // }
 
-// export default App;
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -140,12 +139,12 @@ import PurchaseProduct from "./components/PurchaseProduct";
 import SellProduct from "./components/SellProduct";
 import StockMovement from "./components/StockMovement";
 import ChatBot from "./components/ChatBot";
-import { AuthProvider } from "./AuthContext";
 
 import Login from "./Login";
 import Signup from "./Signup";
 import ProtectedRoute from "./ProtectedRoute";
 
+import { AuthProvider, AuthContext } from "./AuthContext";
 import { ProductProvider } from "./ProductContext";
 import { SupplierContextProvider } from "./SupplierContext";
 import { UpdateProductContextProvider } from "./UpdateProductContext";
@@ -155,31 +154,22 @@ import { UpdateProductContextProvider } from "./UpdateProductContext";
 
 function Layout() {
   const location = useLocation();
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const { token } = useContext(AuthContext); // read token from context
 
-  // 🔥 Update token on localStorage change (logout/login)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const t = localStorage.getItem("token");
-      if (t !== token) setToken(t);
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, [token]);
-
-  // Hide UI on login/signup
-  const hideUI = ["/login", "/signup"].includes(location.pathname);
+  // Hide Navbar ONLY on login/signup pages
+  const hideUI = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>
-      {!hideUI && token && <NavBar />}
+      {/* ✅ NAVBAR ALWAYS SHOWS (except login/signup pages) */}
+      {!hideUI && <NavBar />}
 
       <Routes>
-        {/* Public Routes */}
+        {/* ---------- Public Routes ---------- */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected Routes */}
+        {/* ---------- Protected Routes ---------- */}
         <Route
           path="/"
           element={
@@ -244,11 +234,12 @@ function Layout() {
         />
       </Routes>
 
-      {/* ChatBot Only When Logged In */}
+      {/* Show chatbot ONLY when user is logged in */}
       {!hideUI && token && <ChatBot />}
     </>
   );
 }
+
 
 /* ----------------------- App Wrapper ------------------------ */
 
@@ -268,4 +259,5 @@ function App() {
   );
 }
 
-export default App; 
+export default App;
+

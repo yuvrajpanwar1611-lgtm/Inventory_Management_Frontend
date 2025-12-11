@@ -8,7 +8,6 @@ const AddProducts = () => {
     ProfitPerPiece: "",
   });
 
-  // Redirect to login if token missing
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       window.location.href = "/login";
@@ -33,16 +32,18 @@ const AddProducts = () => {
 
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`https://inventory-management-ero4.onrender.com/product/${info.Supplier}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+      `https://inventory-management-ero4.onrender.com/product/${info.Supplier}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
-    // If token expired → redirect to login
     if (res.status === 401) {
       alert("Session expired. Please login again.");
       localStorage.removeItem("token");
@@ -71,10 +72,11 @@ const AddProducts = () => {
           <h3 className="card-title mb-3">Add Product</h3>
 
           <form onSubmit={postData}>
-            {/* Supplier ID FIRST */}
+
             <div className="mb-3">
               <label className="form-label">Supplier ID</label>
               <input
+                id="supplier"
                 className="form-control"
                 name="Supplier"
                 value={info.Supplier}
@@ -83,10 +85,10 @@ const AddProducts = () => {
               />
             </div>
 
-            {/* Product Name */}
             <div className="mb-3">
               <label className="form-label">Product Name</label>
               <input
+                id="product_name"
                 className="form-control"
                 name="ProductName"
                 value={info.ProductName}
@@ -95,10 +97,10 @@ const AddProducts = () => {
               />
             </div>
 
-            {/* Unit Price */}
             <div className="mb-3">
               <label className="form-label">Unit Price</label>
               <input
+                id="unit_price"
                 className="form-control"
                 type="number"
                 name="UnitPrice"
@@ -108,10 +110,10 @@ const AddProducts = () => {
               />
             </div>
 
-            {/* Profit Per Piece */}
             <div className="mb-3">
               <label className="form-label">Profit Per Piece</label>
               <input
+                id="profit"
                 className="form-control"
                 type="number"
                 name="ProfitPerPiece"

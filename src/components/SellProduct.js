@@ -69,10 +69,10 @@ const SellProduct = () => {
     e.preventDefault();
     setInvoiceUrl(null);
 
-    // Basic validation
     for (const row of rows) {
       if (!row.product_id) return alert("Select product in all rows");
       if (Number(row.qty) <= 0) return alert("Quantity must be > 0");
+
       if (Number(row.qty) > Number(row.max_stock)) {
         const ok = window.confirm(`${row.name} has only ${row.max_stock} left. Continue?`);
         if (!ok) return;
@@ -96,7 +96,6 @@ const SellProduct = () => {
 
     setLoading(true);
 
-    // 🔥 NEW API ENDPOINT (/product/sell)
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/product/sell", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -109,10 +108,8 @@ const SellProduct = () => {
 
     alert("Sale completed!");
 
-    // Save invoice file link
     setInvoiceUrl("https://inventory-management-ero4.onrender.com" + data.invoice_pdf);
 
-    // Reset form
     setRows([{ id: Date.now(), product_id: "", qty: 1, sell_price: "", name: "", max_stock: 0 }]);
     setCustomer({ customerName: "", customerPhone: "", customerEmail: "" });
 
@@ -128,7 +125,11 @@ const SellProduct = () => {
           <form onSubmit={handleSell}>
             {rows.map(row => (
               <div key={row.id} className="d-flex gap-2 mb-2 align-items-center">
+                
+                {/* PRODUCT SELECT */}
                 <select
+                  id={`product-${row.id}`}
+                  name="product_id"
                   className="form-control"
                   style={{ flex: 3 }}
                   value={row.product_id}
@@ -142,7 +143,10 @@ const SellProduct = () => {
                   ))}
                 </select>
 
+                {/* QTY */}
                 <input
+                  id={`qty-${row.id}`}
+                  name="qty"
                   className="form-control"
                   type="number"
                   style={{ width: "100px" }}
@@ -150,7 +154,10 @@ const SellProduct = () => {
                   onChange={(e) => onRowChange(row.id, "qty", e.target.value)}
                 />
 
+                {/* SELL PRICE */}
                 <input
+                  id={`sell_price-${row.id}`}
+                  name="sell_price"
                   className="form-control"
                   type="number"
                   style={{ width: "140px" }}
@@ -181,19 +188,28 @@ const SellProduct = () => {
             <hr />
 
             <h5>Customer Info</h5>
+
             <input
+              id="customerName"
+              name="customerName"
               className="form-control mb-2"
               placeholder="Customer Name"
               value={customer.customerName}
               onChange={(e) => setCustomer({ ...customer, customerName: e.target.value })}
             />
+
             <input
+              id="customerPhone"
+              name="customerPhone"
               className="form-control mb-2"
               placeholder="Phone"
               value={customer.customerPhone}
               onChange={(e) => setCustomer({ ...customer, customerPhone: e.target.value })}
             />
+
             <input
+              id="customerEmail"
+              name="customerEmail"
               className="form-control mb-3"
               placeholder="Email"
               value={customer.customerEmail}

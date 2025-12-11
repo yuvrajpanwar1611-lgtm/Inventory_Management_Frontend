@@ -5,14 +5,22 @@ import secureFetch from "../secureFetch";
 const UpdateProduct = () => {
   const [info, setInfo] = useContext(UpdateProductContext);
 
+  // Redirect if loaded without selected product
   useEffect(() => {
-    if (!info.ProductId) {
+    if (!info?.ProductId) {
       window.location.href = "/";
     }
-  }, []);
+  }, [info]);
 
   const handleChange = (e) => {
-    setInfo({ ...info, [e.target.name]: e.target.value });
+    let value = e.target.value;
+
+    // Convert number fields safely
+    if (e.target.type === "number") {
+      value = value === "" ? "" : Number(value);
+    }
+
+    setInfo({ ...info, [e.target.name]: value });
   };
 
   const updateData = async (e) => {
@@ -38,9 +46,13 @@ const UpdateProduct = () => {
     if (res.ok) {
       alert("Product updated successfully!");
     } else {
-      alert("Update failed");
+      const err = await res.json();
+      alert(err.detail || "Update failed");
     }
   };
+
+  // Prevent UI render if info not ready
+  if (!info?.ProductId) return null;
 
   return (
     <div className="container mt-4">
@@ -50,77 +62,88 @@ const UpdateProduct = () => {
 
           <form onSubmit={updateData}>
             <div className="mb-3">
-              <label>Product Name</label>
+              <label htmlFor="product-name">Product Name</label>
               <input
+                id="product-name"
                 className="form-control"
                 name="ProductName"
                 value={info.ProductName}
                 onChange={handleChange}
+                required
               />
             </div>
 
             <div className="row">
               <div className="col-md-6 mb-3">
-                <label>Quantity In Stock</label>
+                <label htmlFor="qty-stock">Quantity In Stock</label>
                 <input
+                  id="qty-stock"
                   type="number"
                   className="form-control"
                   name="QuantityInStock"
                   value={info.QuantityInStock}
                   onChange={handleChange}
+                  required
                 />
               </div>
 
               <div className="col-md-6 mb-3">
-                <label>Quantity Sold</label>
+                <label htmlFor="qty-sold">Quantity Sold</label>
                 <input
+                  id="qty-sold"
                   type="number"
                   className="form-control"
                   name="QuantitySold"
                   value={info.QuantitySold}
                   onChange={handleChange}
+                  required
                 />
               </div>
             </div>
 
             <div className="row">
               <div className="col-md-6 mb-3">
-                <label>Unit Price</label>
+                <label htmlFor="unit-price">Unit Price</label>
                 <input
+                  id="unit-price"
                   type="number"
                   className="form-control"
                   name="UnitPrice"
                   value={info.UnitPrice}
                   onChange={handleChange}
+                  required
                 />
               </div>
 
               <div className="col-md-6 mb-3">
-                <label>Revenue</label>
+                <label htmlFor="revenue">Revenue</label>
                 <input
+                  id="revenue"
                   type="number"
                   className="form-control"
                   name="Revenue"
                   value={info.Revenue}
                   onChange={handleChange}
+                  required
                 />
               </div>
             </div>
 
             <div className="mb-3">
-              <label>Profit Per Piece</label>
+              <label htmlFor="profit-piece">Profit Per Piece</label>
               <input
+                id="profit-piece"
                 type="number"
                 className="form-control"
                 name="ProfitPerPiece"
                 value={info.ProfitPerPiece}
                 onChange={handleChange}
+                required
               />
             </div>
 
             <button className="btn btn-success w-100">Update Product</button>
           </form>
-
         </div>
       </div>
     </div>

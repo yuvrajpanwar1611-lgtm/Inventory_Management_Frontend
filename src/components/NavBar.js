@@ -65,7 +65,6 @@
 
 
 
-
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
@@ -74,39 +73,47 @@ const NavBar = () => {
   const [products] = useContext(ProductContext);
   const [user, setUser] = useState(null);
 
+  // ============================
+  // FETCH LOGGED-IN USER DETAILS
+  // ============================
   const fetchUser = async () => {
-    let token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-    // 🚨 Prevent calling API with invalid token
+    // 🚫 Prevent calling backend with invalid token
     if (!token || token === "undefined" || token === "null") {
-      console.log("Token missing → skip /users/me");
+      console.log("Token missing → skipping /users/me");
       return;
     }
 
     try {
-      const res = await fetch("https://inventory-management-ero4.onrender.com/users/me", {
-        headers: { Authorization: "Bearer " + token },
-      });
+      const res = await fetch(
+        "https://inventory-management-ero4.onrender.com/users/me",
+        {
+          headers: { Authorization: "Bearer " + token },
+        }
+      );
 
       if (res.status === 401) {
-        console.warn("Token invalid but NOT logging out.");
+        console.warn("Token expired or invalid → do NOT logout automatically");
         return;
       }
 
       const data = await res.json();
       setUser(data);
     } catch (err) {
-      console.error("User fetch failed:", err);
+      console.error("Failed to load user:", err);
     }
   };
 
+  // Delay ensures token is saved before API call
   useEffect(() => {
-    // ⏳ Delay ensures token is saved before fetch happens
-    setTimeout(fetchUser, 250);
+    const timer = setTimeout(fetchUser, 200);
+    return () => clearTimeout(timer); // Cleanup
   }, []);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+      {/* LEFT SIDE NAV LINKS */}
       <div className="d-flex align-items-center gap-3">
         <Link to="/" className="navbar-brand fw-bold">Home</Link>
         <Link to="/addproduct" className="nav-link text-white">Add Product</Link>
@@ -116,12 +123,13 @@ const NavBar = () => {
         <Link to="/movement/1" className="nav-link text-white">Movement</Link>
       </div>
 
+      {/* RIGHT SIDE USER + LOGOUT */}
       <div className="ms-auto d-flex align-items-center gap-4 text-white">
         <span>Products: {products?.data?.length || 0}</span>
 
         {user && (
           <span className="fw-bold">
-            👤 {user.full_name ? user.full_name : user.username}
+            👤 {user.full_name?.trim() ? user.full_name : user.username}
           </span>
         )}
 

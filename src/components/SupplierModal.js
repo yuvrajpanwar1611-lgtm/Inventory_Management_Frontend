@@ -4,6 +4,8 @@ import React from "react";
 const SupplierModal = ({ open, loading, supplier, onClose }) => {
   if (!open) return null;
 
+  const noSupplier = !loading && !supplier;
+
   return (
     <>
       {/* BACKDROP */}
@@ -28,38 +30,43 @@ const SupplierModal = ({ open, loading, supplier, onClose }) => {
             </div>
 
             <div className="modal-body">
-              {loading ? (
+              {/* LOADING */}
+              {loading && (
                 <div className="text-center py-4">
                   <div className="spinner-border text-primary"></div>
                 </div>
-              ) : (
-                supplier && (
-                  <>
-                    <p><strong>Name:</strong> {supplier.name}</p>
-                    <p><strong>Company:</strong> {supplier.company}</p>
-                    <p><strong>Email:</strong> {supplier.email}</p>
-                    <p><strong>Phone:</strong> {supplier.phone}</p>
+              )}
 
-                    <div className="d-flex gap-2 mt-3">
-                      {supplier.email && (
-                        <a className="btn btn-primary" href={`mailto:${supplier.email}`}>
-                          Email
-                        </a>
-                      )}
-                      {supplier.phone && (
-                        <a className="btn btn-success" href={`tel:${supplier.phone}`}>
-                          Call
-                        </a>
-                      )}
-                    </div>
-                  </>
-                )
+              {/* NO SUPPLIER */}
+              {noSupplier && (
+                <div className="alert alert-warning text-center">
+                  Supplier not found or no supplier assigned.
+                </div>
+              )}
+
+              {/* SUPPLIER FOUND */}
+              {!loading && supplier && (
+                <>
+                  <p><strong>Name:</strong> {supplier.name}</p>
+                  <p><strong>Company:</strong> {supplier.company}</p>
+                  <p><strong>Email:</strong> {supplier.email}</p>
+                  <p><strong>Phone:</strong> {supplier.phone}</p>
+
+                  <div className="d-flex gap-2 mt-3">
+                    {supplier.email && (
+                      <a className="btn btn-primary" href={`mailto:${supplier.email}`}>
+                        Email
+                      </a>
+                    )}
+                    {supplier.phone && (
+                      <a className="btn btn-success" href={`tel:${supplier.phone}`}>
+                        Call
+                      </a>
+                    )}
+                  </div>
+                </>
               )}
             </div>
-
-            {/* <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={onClose}>Close</button>
-            </div> */}
 
           </div>
         </div>

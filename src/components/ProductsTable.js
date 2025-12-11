@@ -16,7 +16,7 @@ const ProductsTable = () => {
 
   const navigate = useNavigate();
 
-  // secure fetch helper
+  // ---------------- SECURE FETCH ----------------
   const secureFetch = async (url, options = {}) => {
     const token = localStorage.getItem("token");
 
@@ -38,9 +38,12 @@ const ProductsTable = () => {
     return res;
   };
 
+  // ---------------- FETCH PRODUCTS ----------------
   const fetchProducts = async () => {
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const data = await res.json();
+
+    // API returns { status, data } so update correctly
     setProducts({ data: data.data || [] });
   };
 
@@ -48,6 +51,7 @@ const ProductsTable = () => {
     fetchProducts();
   }, []);
 
+  // ---------------- EDIT HANDLER ----------------
   const handleEdit = (p) => {
     setUpdateProductInfo({
       ProductId: p.id,
@@ -61,12 +65,14 @@ const ProductsTable = () => {
     navigate("/updateproduct");
   };
 
+  // ---------------- DELETE HANDLER ----------------
   const handleDelete = async (p) => {
     if (!window.confirm("Delete this product?")) return;
 
-    const res = await secureFetch(`https://inventory-management-ero4.onrender.com/product/${p.id}`, {
-      method: "DELETE",
-    });
+    const res = await secureFetch(
+      `https://inventory-management-ero4.onrender.com/product/${p.id}`,
+      { method: "DELETE" }
+    );
 
     if (res.ok) {
       setProducts(prev => ({
@@ -76,7 +82,7 @@ const ProductsTable = () => {
     }
   };
 
-  // NEW: open supplier modal
+  // ---------------- VIEW SUPPLIER ----------------
   const handleViewSupplier = async (supplierId) => {
     if (!supplierId) {
       alert("No supplier linked to this product.");
@@ -87,13 +93,11 @@ const ProductsTable = () => {
     setSupplierModalOpen(true);
 
     try {
-      const res = await secureFetch(`https://inventory-management-ero4.onrender.com/supplier/${supplierId}`);
+      const res = await secureFetch(
+        `https://inventory-management-ero4.onrender.com/supplier/${supplierId}`
+      );
       const json = await res.json();
-
-      // FIX: now always gives clean supplier object
-      const supplierObject = json.data ?? json ?? null;
-      setSupplierData(supplierObject);
-
+      setSupplierData(json.data ?? null);
     } catch (err) {
       console.error(err);
       alert("Failed to load supplier details");
@@ -102,6 +106,10 @@ const ProductsTable = () => {
 
     setSupplierLoading(false);
   };
+
+  // ---------------- CURRENCY FORMAT ----------------
+  const formatCurrency = (value) =>
+    "₹" + Number(value || 0).toLocaleString("en-IN");
 
   return (
     <div className="container mt-4">
@@ -113,6 +121,7 @@ const ProductsTable = () => {
             <tr>
               <th>ID</th>
               <th>Name</th>
+              <th>Supplier</th> {/* NEW */}
               <th>In Stock</th>
               <th>Sold</th>
               <th>Unit Price</th>
@@ -127,7 +136,10 @@ const ProductsTable = () => {
               products.data.map((p) => (
                 <ProductRow
                   key={p.id}
-                  product={p}
+                  product={{
+                    ...p,
+                    supplier_name: p.supplied_by?.name || "—", // supplier prefetch fix
+                  }}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
                   onViewSupplier={handleViewSupplier}
@@ -135,14 +147,16 @@ const ProductsTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="fw-bold py-3">No Products Found</td>
+                <td colSpan="9" className="fw-bold py-3">
+                  No Products Found
+                </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* MODAL */}
+      {/* SUPPLIER MODAL */}
       <SupplierModal
         open={supplierModalOpen}
         loading={supplierLoading}

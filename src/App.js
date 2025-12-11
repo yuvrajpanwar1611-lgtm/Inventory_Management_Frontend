@@ -123,8 +123,13 @@
 // }
 
 // export default App;
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 
 import NavBar from "./components/NavBar";
 import ProductsTable from "./components/ProductsTable";
@@ -144,21 +149,36 @@ import { ProductProvider } from "./ProductContext";
 import { SupplierContextProvider } from "./SupplierContext";
 import { UpdateProductContextProvider } from "./UpdateProductContext";
 
+
+/* ----------------------- Layout Component ------------------------ */
+
 function Layout() {
   const location = useLocation();
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
-  const hideUI =
-    location.pathname === "/login" || location.pathname === "/signup";
+  // 🔥 Update token on localStorage change (logout/login)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const t = localStorage.getItem("token");
+      if (t !== token) setToken(t);
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, [token]);
+
+  // Hide UI on login/signup
+  const hideUI = ["/login", "/signup"].includes(location.pathname);
 
   return (
     <>
       {!hideUI && token && <NavBar />}
 
       <Routes>
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
+        {/* Protected Routes */}
         <Route
           path="/"
           element={
@@ -223,10 +243,13 @@ function Layout() {
         />
       </Routes>
 
+      {/* ChatBot Only When Logged In */}
       {!hideUI && token && <ChatBot />}
     </>
   );
 }
+
+/* ----------------------- App Wrapper ------------------------ */
 
 function App() {
   return (

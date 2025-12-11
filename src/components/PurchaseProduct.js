@@ -14,6 +14,7 @@ const PurchaseProduct = () => {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  // ===================== LOAD PRODUCTS + SUPPLIERS =====================
   const loadData = async () => {
     const prod = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const prodData = await prod.json();
@@ -29,6 +30,7 @@ const PurchaseProduct = () => {
     loadData();
   }, []);
 
+  // ===================== SELECT PRODUCT =====================
   const handleProductSelect = (e) => {
     const pid = Number(e.target.value);
     const product = products.find((p) => p.id === pid);
@@ -38,11 +40,12 @@ const PurchaseProduct = () => {
     setForm({
       ...form,
       productId: pid,
-      supplier_id: product ? product.supplied_by_id : "",
-      buy_price: product ? Number(product.unit_price) : "",
+      supplier_id: product?.supplied_by_id || "",
+      buy_price: product?.unit_price || "",
     });
   };
 
+  // ===================== HANDLE SUBMIT =====================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -56,6 +59,7 @@ const PurchaseProduct = () => {
       `https://inventory-management-ero4.onrender.com/product/purchase/${form.productId}`,
       {
         method: "POST",
+        headers: { "Content-Type": "application/json" }, // FIXED
         body: JSON.stringify(payload),
       }
     );
@@ -68,6 +72,8 @@ const PurchaseProduct = () => {
     }
 
     alert("Stock purchased successfully!");
+
+    // reset form
     setForm({ productId: "", supplier_id: "", quantity: "", buy_price: "" });
     setSelectedProduct(null);
   };
@@ -80,14 +86,16 @@ const PurchaseProduct = () => {
           <h3 className="mb-3">Purchase Product</h3>
 
           <form onSubmit={handleSubmit}>
-
-            {/* Product dropdown */}
+            
+            {/* PRODUCT DROPDOWN */}
             <div className="mb-3">
-              <label>Select Product</label>
+              <label className="form-label">Select Product</label>
               <select
+                name="productId"
                 className="form-control"
                 value={form.productId}
                 onChange={handleProductSelect}
+                required
               >
                 <option value="">-- Select Product --</option>
                 {products.map((p) => (
@@ -98,15 +106,17 @@ const PurchaseProduct = () => {
               </select>
             </div>
 
-            {/* Supplier dropdown auto-filled */}
+            {/* SUPPLIER DROPDOWN */}
             <div className="mb-3">
-              <label>Select Supplier</label>
+              <label className="form-label">Select Supplier</label>
               <select
+                name="supplier_id"
                 className="form-control"
                 value={form.supplier_id}
                 onChange={(e) =>
                   setForm({ ...form, supplier_id: e.target.value })
                 }
+                required
               >
                 <option value="">-- Select Supplier --</option>
                 {suppliers.map((s) => (
@@ -117,12 +127,13 @@ const PurchaseProduct = () => {
               </select>
             </div>
 
-            {/* Quantity + Price */}
+            {/* QUANTITY + PRICE */}
             <div className="row">
               <div className="col-md-6 mb-3">
-                <label>Quantity</label>
+                <label className="form-label">Quantity</label>
                 <input
                   type="number"
+                  name="quantity"
                   className="form-control"
                   value={form.quantity}
                   onChange={(e) =>
@@ -133,9 +144,10 @@ const PurchaseProduct = () => {
               </div>
 
               <div className="col-md-6 mb-3">
-                <label>Buy Price</label>
+                <label className="form-label">Buy Price</label>
                 <input
                   type="number"
+                  name="buy_price"
                   className="form-control"
                   value={form.buy_price}
                   onChange={(e) =>

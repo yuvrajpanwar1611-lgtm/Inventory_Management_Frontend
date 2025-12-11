@@ -79,25 +79,55 @@ const SupplierPage = () => {
 
           <form onSubmit={addSupplier}>
             <div className="row">
+              
               <div className="col-md-6 mb-3">
-                <label>Name</label>
-                <input className="form-control" name="name" value={form.name} onChange={handleChange} required/>
+                <label htmlFor="sup-name">Name</label>
+                <input
+                  id="sup-name"
+                  className="form-control"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="col-md-6 mb-3">
-                <label>Company</label>
-                <input className="form-control" name="company" value={form.company} onChange={handleChange} required/>
+                <label htmlFor="sup-company">Company</label>
+                <input
+                  id="sup-company"
+                  className="form-control"
+                  name="company"
+                  value={form.company}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="col-md-6 mb-3">
-                <label>Email</label>
-                <input className="form-control" name="email" value={form.email} onChange={handleChange} required/>
+                <label htmlFor="sup-email">Email</label>
+                <input
+                  id="sup-email"
+                  className="form-control"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="col-md-6 mb-3">
-                <label>Phone</label>
-                <input className="form-control" name="phone" value={form.phone} onChange={handleChange} required/>
+                <label htmlFor="sup-phone">Phone</label>
+                <input
+                  id="sup-phone"
+                  className="form-control"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                />
               </div>
+
             </div>
 
             <button className="btn btn-primary w-100">Add Supplier</button>
@@ -105,7 +135,7 @@ const SupplierPage = () => {
         </div>
       </div>
 
-      {/* SUPPLIER TABLE */}
+      {/* TABLE */}
       <div className="table-responsive shadow-sm">
         <table className="table table-bordered table-hover text-center">
           <thead className="table-primary">
@@ -129,13 +159,15 @@ const SupplierPage = () => {
                   <td>{s.email}</td>
                   <td>{s.phone}</td>
                   <td>
-                    <button className="btn btn-warning btn-sm me-2"
+                    <button
+                      className="btn btn-warning btn-sm me-2"
                       onClick={() => setEdit({ ...s })}
                     >
                       Edit
                     </button>
 
-                    <button className="btn btn-danger btn-sm"
+                    <button
+                      className="btn btn-danger btn-sm"
                       onClick={() => deleteSupplier(s.id)}
                     >
                       Delete
@@ -158,27 +190,43 @@ const SupplierPage = () => {
 
             <form onSubmit={updateSupplier}>
               <div className="mb-3">
-                <label>Name</label>
-                <input className="form-control" value={edit.name}
-                  onChange={(e) => setEdit({ ...edit, name: e.target.value })}/>
+                <label htmlFor="edit-name">Name</label>
+                <input
+                  id="edit-name"
+                  className="form-control"
+                  value={edit.name}
+                  onChange={(e) => setEdit({ ...edit, name: e.target.value })}
+                />
               </div>
 
               <div className="mb-3">
-                <label>Company</label>
-                <input className="form-control" value={edit.company}
-                  onChange={(e) => setEdit({ ...edit, company: e.target.value })}/>
+                <label htmlFor="edit-company">Company</label>
+                <input
+                  id="edit-company"
+                  className="form-control"
+                  value={edit.company}
+                  onChange={(e) => setEdit({ ...edit, company: e.target.value })}
+                />
               </div>
 
               <div className="mb-3">
-                <label>Email</label>
-                <input className="form-control" value={edit.email}
-                  onChange={(e) => setEdit({ ...edit, email: e.target.value })}/>
+                <label htmlFor="edit-email">Email</label>
+                <input
+                  id="edit-email"
+                  className="form-control"
+                  value={edit.email}
+                  onChange={(e) => setEdit({ ...edit, email: e.target.value })}
+                />
               </div>
 
               <div className="mb-3">
-                <label>Phone</label>
-                <input className="form-control" value={edit.phone}
-                  onChange={(e) => setEdit({ ...edit, phone: e.target.value })}/>
+                <label htmlFor="edit-phone">Phone</label>
+                <input
+                  id="edit-phone"
+                  className="form-control"
+                  value={edit.phone}
+                  onChange={(e) => setEdit({ ...edit, phone: e.target.value })}
+                />
               </div>
 
               <button className="btn btn-success w-100">Update</button>

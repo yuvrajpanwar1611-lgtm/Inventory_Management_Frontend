@@ -7,6 +7,15 @@ const StockMovement = () => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState("");
 
+  // Safe timestamp handler
+  const safeDate = (ts) => {
+    try {
+      return new Date(ts).toLocaleString();
+    } catch {
+      return ts;
+    }
+  };
+
   // Load all movements
   const loadMovements = async () => {
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/movements");
@@ -15,7 +24,7 @@ const StockMovement = () => {
     setFilteredMovements(data.data || []);
   };
 
-  // Load product list for filter
+  // Load products for dropdown
   const loadProducts = async () => {
     const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
     const data = await res.json();
@@ -27,7 +36,7 @@ const StockMovement = () => {
     loadProducts();
   }, []);
 
-  // Filter movements by selected product
+  // Filter movements by product
   const handleFilter = (productId) => {
     setSelectedProduct(productId);
 
@@ -46,8 +55,13 @@ const StockMovement = () => {
 
       {/* FILTER DROPDOWN */}
       <div className="card shadow-sm mb-4 p-3">
-        <label className="form-label fw-bold">Filter by Product</label>
+        <label className="form-label fw-bold" htmlFor="productFilter">
+          Filter by Product
+        </label>
+
         <select
+          id="productFilter"
+          name="productFilter"
           className="form-control"
           value={selectedProduct}
           onChange={(e) => handleFilter(e.target.value)}
@@ -61,7 +75,7 @@ const StockMovement = () => {
         </select>
       </div>
 
-      {/* MOVEMENTS LIST */}
+      {/* MOVEMENT CARDS */}
       {filteredMovements.length === 0 ? (
         <div className="alert alert-info">No movement history found.</div>
       ) : (
@@ -85,9 +99,7 @@ const StockMovement = () => {
                 )}
               </h5>
 
-              <small className="text-muted">
-                {new Date(m.timestamp).toLocaleString()}
-              </small>
+              <small className="text-muted">{safeDate(m.timestamp)}</small>
             </div>
 
             <div className="mt-2">
@@ -122,7 +134,6 @@ const StockMovement = () => {
                     <strong>Email:</strong> {m.customer_email}
                   </p>
 
-                  {/* DOWNLOAD INVOICE BUTTON */}
                   {m.invoice_number && (
                     <a
                       href={`https://inventory-management-ero4.onrender.com/download_invoice/${m.invoice_number}`}

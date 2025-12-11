@@ -15,20 +15,11 @@ export function useSecureFetch() {
       headers.Authorization = "Bearer " + token;
     }
 
-    const res = await fetch(url, {
-      ...options,
-      headers,
-    });
+    const res = await fetch(url, { ...options, headers });
 
-    // Handle token expiry safely
     if (res.status === 401) {
-      console.warn("401 received → token likely expired or invalid.");
-
-      //  Avoid double alerts or infinite reload loops
-      if (token) {
-        alert("Session expired. Please login again.");
-        logout(); // AuthContext handles cleanup + redirect
-      }
+      alert("Session expired. Please login again.");
+      logout();
     }
 
     return res;

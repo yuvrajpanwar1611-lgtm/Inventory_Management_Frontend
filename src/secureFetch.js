@@ -1,23 +1,27 @@
-// src/secureFetch.js
-import { AuthContext } from "./AuthContext";
+// src/useSecureFetch.js
 import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
-export default function secureFetch(url, options = {}) {
-  const token = localStorage.getItem("token");
+export function SecureFetch() {
+  const { token, logout } = useContext(AuthContext);
 
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  };
+  return async (url, options = {}) => {
+    const headers = {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    };
 
-  if (token) headers.Authorization = "Bearer " + token;
+    if (token) {
+      headers.Authorization = "Bearer " + token;
+    }
 
-  return fetch(url, { ...options, headers }).then((res) => {
+    const res = await fetch(url, { ...options, headers });
+
     if (res.status === 401) {
       alert("Session expired. Please login again.");
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      logout();
     }
+
     return res;
-  });
+  };
 }

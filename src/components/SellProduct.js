@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import useSecureFetch from "../useSecureFetch"; // ✅ CORRECT HOOK IMPORT
 
 const SellProduct = () => {
@@ -19,17 +19,17 @@ const SellProduct = () => {
   const [invoiceUrl, setInvoiceUrl] = useState(null);
 
   /* ---------------------- LOAD PRODUCTS ---------------------- */
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     const res = await secureFetch(
       "https://inventory-management-ero4.onrender.com/product"
     );
     const data = await res.json();
     setProducts(data.data || []);
-  };
+  }, [secureFetch]);
 
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [loadProducts]);
 
   /* ---------------------- ROW OPERATIONS ---------------------- */
   const addRow = () => {
@@ -236,7 +236,7 @@ const SellProduct = () => {
           {invoiceUrl && (
             <div className="alert alert-success mt-3">
               <h5>Invoice Ready</h5>
-              <a href={invoiceUrl} target="_blank" className="btn btn-success">
+              <a href={invoiceUrl} target="_blank" rel="noreferrer" className="btn btn-success">
                 Download Invoice
               </a>
             </div>

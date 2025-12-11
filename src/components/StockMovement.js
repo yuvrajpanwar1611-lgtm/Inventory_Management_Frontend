@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import useSecureFetch from "../useSecureFetch"; // ✅ CORRECT IMPORT
 
 const StockMovement = () => {
@@ -19,28 +19,28 @@ const StockMovement = () => {
   };
 
   /* ---------------- LOAD MOVEMENTS ---------------- */
-  const loadMovements = async () => {
+  const loadMovements = useCallback(async () => {
     const res = await secureFetch(
       "https://inventory-management-ero4.onrender.com/movements"
     );
     const data = await res.json();
     setMovements(data.data || []);
     setFilteredMovements(data.data || []);
-  };
+  }, [secureFetch]);
 
   /* ---------------- LOAD PRODUCTS ---------------- */
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
     const res = await secureFetch(
       "https://inventory-management-ero4.onrender.com/product"
     );
     const data = await res.json();
     setProducts(data.data || []);
-  };
+  }, [secureFetch]);
 
   useEffect(() => {
     loadMovements();
     loadProducts();
-  }, []);
+  }, [loadMovements, loadProducts]);
 
   /* ---------------- FILTER HANDLER ---------------- */
   const handleFilter = (productId) => {

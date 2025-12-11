@@ -1,5 +1,5 @@
 // src/components/ProductsTable.js
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, useCallback } from "react";
 import { ProductContext } from "../ProductContext";
 import { UpdateProductContext } from "../UpdateProductContext";
 import ProductRow from "./ProductRow";
@@ -9,8 +9,7 @@ import useSecureFetch from "../useSecureFetch"; // IMPORTANT
 
 const ProductsTable = () => {
   const [products, setProducts] = useContext(ProductContext);
-  const [updateProductInfo, setUpdateProductInfo] =
-    useContext(UpdateProductContext);
+  const [, setUpdateProductInfo] = useContext(UpdateProductContext);
 
   const [supplierModalOpen, setSupplierModalOpen] = useState(false);
   const [supplierLoading, setSupplierLoading] = useState(false);
@@ -20,7 +19,7 @@ const ProductsTable = () => {
   const navigate = useNavigate();
 
   /* ---------------- FETCH PRODUCTS ---------------- */
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     const res = await secureFetch(
       "https://inventory-management-ero4.onrender.com/product"
     );
@@ -29,11 +28,11 @@ const ProductsTable = () => {
 
     const data = await res.json();
     setProducts({ data: data.data || [] });
-  };
+  }, [secureFetch, setProducts]);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   /* ---------------- EDIT HANDLER ---------------- */
   const handleEdit = (p) => {

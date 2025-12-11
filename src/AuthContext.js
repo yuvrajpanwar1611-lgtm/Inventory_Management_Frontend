@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
       }
     }
-  }, []); // runs only on mount
+  }, [token]); // runs on token change to re-check expiry
 
   /* -----------------------------------------------------
       LOGIN — Save token + update React + redirect
@@ -81,4 +81,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-

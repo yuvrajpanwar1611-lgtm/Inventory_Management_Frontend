@@ -1,5 +1,5 @@
 // src/components/SupplierPage.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import useSecureFetch from "../useSecureFetch";
 
 const SupplierPage = () => {
@@ -16,7 +16,7 @@ const SupplierPage = () => {
   const [edit, setEdit] = useState(null);
 
   /* -------------------- LOAD SUPPLIERS -------------------- */
-  const loadSuppliers = async () => {
+  const loadSuppliers = useCallback(async () => {
     const res = await secureFetch(
       "https://inventory-management-ero4.onrender.com/supplier"
     );
@@ -25,11 +25,11 @@ const SupplierPage = () => {
 
     const data = await res.json();
     setSuppliers(data.data || []);
-  };
+  }, [secureFetch]);
 
   useEffect(() => {
     loadSuppliers();
-  }, []);
+  }, [loadSuppliers]);
 
   /* -------------------- INPUT CHANGE HANDLER -------------------- */
   const handleChange = (e) => {

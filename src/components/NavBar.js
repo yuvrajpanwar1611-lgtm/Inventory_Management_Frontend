@@ -68,12 +68,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
 import { AuthContext } from "../AuthContext";
-import secureFetch from "../secureFetch"; // ✅ FIX: import secureFetch
+import useSecureFetch from "../useSecureFetch";
 
 const NavBar = () => {
   const [products] = useContext(ProductContext);
   const { token, logout } = useContext(AuthContext);
   const [user, setUser] = useState(null);
+  const secureFetch = useSecureFetch();
 
   useEffect(() => {
     if (!token) {
@@ -100,7 +101,7 @@ const NavBar = () => {
     };
 
     fetchUser();
-  }, [token]); // 🔥 Re-runs whenever token updates
+  }, [secureFetch, token]); // 🔥 Re-runs whenever token updates
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-3">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import useSecureFetch from "../useSecureFetch"; // ✅ Correct import
 
 const PurchaseProduct = () => {
@@ -13,10 +13,8 @@ const PurchaseProduct = () => {
     buy_price: "",
   });
 
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
   /* ---------------- LOAD PRODUCTS + SUPPLIERS ---------------- */
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     const prodRes = await secureFetch(
       "https://inventory-management-ero4.onrender.com/product"
     );
@@ -29,25 +27,23 @@ const PurchaseProduct = () => {
 
     setProducts(prodJson.data || []);
     setSuppliers(supJson.data || []);
-  };
+  }, [secureFetch]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   /* ---------------- SELECT PRODUCT ---------------- */
   const handleProductSelect = (e) => {
     const pid = Number(e.target.value);
     const product = products.find((p) => p.id === pid);
 
-    setSelectedProduct(product);
-
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       productId: pid,
       supplier_id: product?.supplied_by_id || "",
       buy_price: product?.unit_price || "",
-    });
+    }));
   };
 
   /* ---------------- SUBMIT PURCHASE ---------------- */
@@ -80,8 +76,6 @@ const PurchaseProduct = () => {
 
     // Reset form
     setForm({ productId: "", supplier_id: "", quantity: "", buy_price: "" });
-    setSelectedProduct(null);
-
     loadData();
   };
 

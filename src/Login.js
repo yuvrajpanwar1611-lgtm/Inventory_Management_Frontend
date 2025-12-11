@@ -55,6 +55,7 @@
 // };
 
 // export default Login;
+// src/Login.js
 import React, { useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
@@ -80,8 +81,8 @@ const Login = () => {
       return alert(data.detail || "Login failed");
     }
 
-    login(data.access_token); // <--- NOW context drives the state
-    window.location.href = "/";
+    // use context login — it stores token and redirects after state updates
+    login(data.access_token);
   };
 
   return (
@@ -94,8 +95,8 @@ const Login = () => {
             className="form-control mb-3"
             placeholder="Username"
             value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
             name="username"
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
             required
           />
 
@@ -104,8 +105,8 @@ const Login = () => {
             type="password"
             placeholder="Password"
             value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
             name="password"
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
 
@@ -121,4 +122,5 @@ const Login = () => {
 };
 
 export default Login;
+
 

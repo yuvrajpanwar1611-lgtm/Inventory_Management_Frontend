@@ -1,21 +1,20 @@
-export default async function secureFetch(url, token, options = {}) {
+// src/secureFetch.js
+export default async function secureFetch(url, options = {}) {
+  const token = localStorage.getItem("token");
+
   const headers = {
-    ...(options.headers || {}),
     "Content-Type": "application/json",
+    ...(options.headers || {}),
   };
 
-  if (token) {
-    headers.Authorization = "Bearer " + token;
-  }
+  if (token) headers.Authorization = "Bearer " + token;
 
-  const res = await fetch(url, {
-    ...options,
-    headers,
-  });
+  const res = await fetch(url, { ...options, headers });
 
   if (res.status === 401) {
-    alert("Session expired. Please login again.");
+    // token invalid/expired -> clear and redirect to login
     localStorage.removeItem("token");
+    alert("Session expired. Please login again.");
     window.location.href = "/login";
   }
 

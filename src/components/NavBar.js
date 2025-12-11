@@ -62,6 +62,7 @@
 // };
 
 // export default NavBar;
+// src/components/NavBar.js
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
@@ -69,31 +70,31 @@ import { AuthContext } from "../AuthContext";
 
 const NavBar = () => {
   const [products] = useContext(ProductContext);
-  const { logout, token } = useContext(AuthContext);
+  const { token, logout } = useContext(AuthContext);
   const [user, setUser] = useState(null);
 
-  const fetchUser = async () => {
-    if (!token) return;
-
-    try {
-      const res = await fetch(
-        "https://inventory-management-ero4.onrender.com/users/me",
-        {
-          headers: { Authorization: "Bearer " + token },
-        }
-      );
-
-      if (res.status === 401) return;
-
-      const data = await res.json();
-      setUser(data);
-    } catch (err) {
-      console.error("Failed to load user:", err);
-    }
-  };
-
   useEffect(() => {
-    setTimeout(fetchUser, 200);
+    const fetchUser = async () => {
+      if (!token) return;
+      try {
+        const res = await fetch("https://inventory-management-ero4.onrender.com/users/me", {
+          headers: { Authorization: "Bearer " + token },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          // don't auto-logout here — let secureFetch handle it if needed
+          console.warn("Failed to fetch user", res.status);
+        }
+      } catch (err) {
+        console.error("User fetch failed:", err);
+      }
+    };
+
+    // small delay to ensure token has been set when login just happened
+    const t = setTimeout(fetchUser, 150);
+    return () => clearTimeout(t);
   }, [token]);
 
   return (
@@ -125,3 +126,4 @@ const NavBar = () => {
 };
 
 export default NavBar;
+

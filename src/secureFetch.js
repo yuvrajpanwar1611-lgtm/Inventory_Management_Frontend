@@ -1,13 +1,16 @@
-export default async function secureFetch(url, options = {}) {
-  const token = localStorage.getItem("token");
+export default async function secureFetch(url, token, options = {}) {
+  const headers = {
+    ...(options.headers || {}),
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers.Authorization = "Bearer " + token;
+  }
 
   const res = await fetch(url, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + token,
-      ...(options.headers || {})
-    }
+    headers,
   });
 
   if (res.status === 401) {

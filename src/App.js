@@ -140,6 +140,7 @@ import PurchaseProduct from "./components/PurchaseProduct";
 import SellProduct from "./components/SellProduct";
 import StockMovement from "./components/StockMovement";
 import ChatBot from "./components/ChatBot";
+import { AuthProvider } from "./AuthContext";
 
 import Login from "./Login";
 import Signup from "./Signup";
@@ -253,16 +254,16 @@ function Layout() {
 
 function App() {
   return (
-    <ProductProvider>
-      <SupplierContextProvider>
-        <UpdateProductContextProvider>
-          <Router>
-            <Layout />
-          </Router>
-        </UpdateProductContextProvider>
-      </SupplierContextProvider>
-    </ProductProvider>
+    <AuthProvider>
+      <ProductProvider>
+        <SupplierContextProvider>
+          <UpdateProductContextProvider>
+            <Router>
+              <Layout />
+            </Router>
+          </UpdateProductContextProvider>
+        </SupplierContextProvider>
+      </ProductProvider>
+    </AuthProvider>
   );
 }
-
-export default App;

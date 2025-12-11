@@ -64,26 +64,21 @@
 // export default NavBar;
 
 
-
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
+import { AuthContext } from "../AuthContext";   // ⬅️ NEW
 
 const NavBar = () => {
   const [products] = useContext(ProductContext);
+  const { logout, token } = useContext(AuthContext);   // ⬅️ NEW
   const [user, setUser] = useState(null);
 
   // ============================
   // FETCH LOGGED-IN USER DETAILS
   // ============================
   const fetchUser = async () => {
-    const token = localStorage.getItem("token");
-
-    // 🚫 Prevent calling backend with invalid token
-    if (!token || token === "undefined" || token === "null") {
-      console.log("Token missing → skipping /users/me");
-      return;
-    }
+    if (!token) return; // ⬅️ USE CONTEXT TOKEN INSTEAD OF localStorage
 
     try {
       const res = await fetch(
@@ -94,7 +89,7 @@ const NavBar = () => {
       );
 
       if (res.status === 401) {
-        console.warn("Token expired or invalid → do NOT logout automatically");
+        console.warn("Token expired or invalid → NOT auto-logging out");
         return;
       }
 
@@ -105,11 +100,9 @@ const NavBar = () => {
     }
   };
 
-  // Delay ensures token is saved before API call
   useEffect(() => {
-    const timer = setTimeout(fetchUser, 200);
-    return () => clearTimeout(timer); // Cleanup
-  }, []);
+    setTimeout(fetchUser, 200);
+  }, [token]); // ⬅️ Fetch again when token changes (login/logout)
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-3">
@@ -135,10 +128,7 @@ const NavBar = () => {
 
         <button
           className="btn btn-light btn-sm"
-          onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
-          }}
+          onClick={logout}          // ⬅️ USE context logout()
         >
           Logout
         </button>

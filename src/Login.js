@@ -55,10 +55,12 @@
 // };
 
 // export default Login;
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });
+  const { login } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -78,8 +80,8 @@ const Login = () => {
       return alert(data.detail || "Login failed");
     }
 
-    localStorage.setItem("token", data.access_token);
-    window.location.href = "/"; // Forces redirect + UI update
+    login(data.access_token); // <--- NOW context drives the state
+    window.location.href = "/";
   };
 
   return (
@@ -93,6 +95,7 @@ const Login = () => {
             placeholder="Username"
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value })}
+            name="username"
             required
           />
 
@@ -102,6 +105,7 @@ const Login = () => {
             placeholder="Password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
+            name="password"
             required
           />
 
@@ -117,3 +121,4 @@ const Login = () => {
 };
 
 export default Login;
+

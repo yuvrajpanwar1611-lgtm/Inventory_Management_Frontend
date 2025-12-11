@@ -62,23 +62,18 @@
 // };
 
 // export default NavBar;
-
-
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
-import { AuthContext } from "../AuthContext";   // ⬅️ NEW
+import { AuthContext } from "../AuthContext";
 
 const NavBar = () => {
   const [products] = useContext(ProductContext);
-  const { logout, token } = useContext(AuthContext);   // ⬅️ NEW
+  const { logout, token } = useContext(AuthContext);
   const [user, setUser] = useState(null);
 
-  // ============================
-  // FETCH LOGGED-IN USER DETAILS
-  // ============================
   const fetchUser = async () => {
-    if (!token) return; // ⬅️ USE CONTEXT TOKEN INSTEAD OF localStorage
+    if (!token) return;
 
     try {
       const res = await fetch(
@@ -88,10 +83,7 @@ const NavBar = () => {
         }
       );
 
-      if (res.status === 401) {
-        console.warn("Token expired or invalid → NOT auto-logging out");
-        return;
-      }
+      if (res.status === 401) return;
 
       const data = await res.json();
       setUser(data);
@@ -102,11 +94,10 @@ const NavBar = () => {
 
   useEffect(() => {
     setTimeout(fetchUser, 200);
-  }, [token]); // ⬅️ Fetch again when token changes (login/logout)
+  }, [token]);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-3">
-      {/* LEFT SIDE NAV LINKS */}
       <div className="d-flex align-items-center gap-3">
         <Link to="/" className="navbar-brand fw-bold">Home</Link>
         <Link to="/addproduct" className="nav-link text-white">Add Product</Link>
@@ -116,7 +107,6 @@ const NavBar = () => {
         <Link to="/movement/1" className="nav-link text-white">Movement</Link>
       </div>
 
-      {/* RIGHT SIDE USER + LOGOUT */}
       <div className="ms-auto d-flex align-items-center gap-4 text-white">
         <span>Products: {products?.data?.length || 0}</span>
 
@@ -126,10 +116,7 @@ const NavBar = () => {
           </span>
         )}
 
-        <button
-          className="btn btn-light btn-sm"
-          onClick={logout}          // ⬅️ USE context logout()
-        >
+        <button className="btn btn-light btn-sm" onClick={logout}>
           Logout
         </button>
       </div>

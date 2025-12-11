@@ -270,7 +270,3 @@ const Signup = () => {
 export default Signup;
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 177726e5fb99ce8af167496629588c4b78fd8439

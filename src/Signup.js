@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 
 const Signup = () => {
+  const BASE_URL = "https://inventory-management-ero4.onrender.com";
+
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -25,7 +27,7 @@ const Signup = () => {
   const sendEmailOtp = async () => {
     if (!form.email) return alert("Enter email");
 
-    const res = await fetch("https://inventory-management-ero4.onrender.com/-email-otp", {
+    const res = await fetch(`${BASE_URL}/send-email-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: form.email }),
@@ -40,7 +42,7 @@ const Signup = () => {
   // VERIFY EMAIL OTP
   // ----------------------------------------------------
   const verifyEmailOtp = async () => {
-    const res = await fetch("https://inventory-management-ero4.onrender.com/verify-email-otp", {
+    const res = await fetch(`${BASE_URL}/verify-email-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: form.email, otp: emailOtp }),
@@ -59,7 +61,7 @@ const Signup = () => {
   const sendPhoneOtp = async () => {
     if (!form.phone) return alert("Enter phone");
 
-    const res = await fetch("https://inventory-management-ero4.onrender.com/send-otp", {
+    const res = await fetch(`${BASE_URL}/send-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile: form.phone }),
@@ -74,7 +76,7 @@ const Signup = () => {
   // VERIFY PHONE OTP
   // ----------------------------------------------------
   const verifyPhoneOtp = async () => {
-    const res = await fetch("http://127.0.0.1:8000/verify-otp", {
+    const res = await fetch(`${BASE_URL}/verify-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile: form.phone, otp: phoneOtp }),
@@ -96,7 +98,8 @@ const Signup = () => {
     if (!phoneVerified) return alert("Verify phone first");
 
     setLoading(true);
-    const res = await fetch("http://127.0.0.1:8000/signup", {
+
+    const res = await fetch(`${BASE_URL}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -265,6 +268,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-
-

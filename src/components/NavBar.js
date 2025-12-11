@@ -62,6 +62,10 @@
 // };
 
 // export default NavBar;
+
+
+
+
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
@@ -71,30 +75,34 @@ const NavBar = () => {
   const [user, setUser] = useState(null);
 
   const fetchUser = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    let token = localStorage.getItem("token");
+
+    // 🚨 Prevent calling API with invalid token
+    if (!token || token === "undefined" || token === "null") {
+      console.log("Token missing → skip /users/me");
+      return;
+    }
 
     try {
       const res = await fetch("https://inventory-management-ero4.onrender.com/users/me", {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
+        headers: { Authorization: "Bearer " + token },
       });
 
-      if (!res.ok) {
-        console.warn("User fetch failed");
+      if (res.status === 401) {
+        console.warn("Token invalid but NOT logging out.");
         return;
       }
 
       const data = await res.json();
       setUser(data);
     } catch (err) {
-      console.error("User fetch error:", err);
+      console.error("User fetch failed:", err);
     }
   };
 
   useEffect(() => {
-    fetchUser();
+    // ⏳ Delay ensures token is saved before fetch happens
+    setTimeout(fetchUser, 250);
   }, []);
 
   return (
@@ -105,17 +113,15 @@ const NavBar = () => {
         <Link to="/purchase" className="nav-link text-white">Purchase Product</Link>
         <Link to="/sell" className="nav-link text-white">Sell Product</Link>
         <Link to="/suppliers" className="nav-link text-white">Suppliers</Link>
-
-        {/* ❗ FIXED */}
-        <Link to="/movements" className="nav-link text-white">Movement</Link>
+        <Link to="/movement/1" className="nav-link text-white">Movement</Link>
       </div>
 
-      <div className="ms-auto d-flex align-items-center gap-3 text-white">
-        <span>Products: {products.data.length}</span>
+      <div className="ms-auto d-flex align-items-center gap-4 text-white">
+        <span>Products: {products?.data?.length || 0}</span>
 
         {user && (
           <span className="fw-bold">
-            👤 {user.full_name || user.username}
+            👤 {user.full_name ? user.full_name : user.username}
           </span>
         )}
 
@@ -134,4 +140,3 @@ const NavBar = () => {
 };
 
 export default NavBar;
-

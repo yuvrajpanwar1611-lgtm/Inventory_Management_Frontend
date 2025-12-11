@@ -6,18 +6,8 @@ import ProductRow from "./ProductRow";
 import SupplierModal from "./SupplierModal";
 import { useNavigate } from "react-router-dom";
 
-const ProductsTable = () => {
-  const [products, setProducts] = useContext(ProductContext);
-  const [updateProductInfo, setUpdateProductInfo] = useContext(UpdateProductContext);
-
-  const [supplierModalOpen, setSupplierModalOpen] = useState(false);
-  const [supplierLoading, setSupplierLoading] = useState(false);
-  const [supplierData, setSupplierData] = useState(null);
-
-  const navigate = useNavigate();
-
-  // ---------------- SECURE FETCH ----------------
-export default async function secureFetch(url, options = {}) {
+/* ---------------- SECURE FETCH (outside component, NO export!) --------------- */
+async function secureFetch(url, options = {}) {
   const token = localStorage.getItem("token");
 
   const headers = {
@@ -29,10 +19,7 @@ export default async function secureFetch(url, options = {}) {
 
   const res = await fetch(url, { ...options, headers });
 
-  // ⛔ If backend says 401, only logout IF token exists
   if (res.status === 401) {
-    console.warn("Backend returned 401 → token probably invalid");
-
     if (token) {
       alert("Session expired. Please login again.");
       localStorage.removeItem("token");
@@ -43,12 +30,26 @@ export default async function secureFetch(url, options = {}) {
   return res;
 }
 
+/* ----------------------------------------------------------------------------- */
+
+const ProductsTable = () => {
+  const [products, setProducts] = useContext(ProductContext);
+  const [updateProductInfo, setUpdateProductInfo] =
+    useContext(UpdateProductContext);
+
+  const [supplierModalOpen, setSupplierModalOpen] = useState(false);
+  const [supplierLoading, setSupplierLoading] = useState(false);
+  const [supplierData, setSupplierData] = useState(null);
+
+  const navigate = useNavigate();
+
   // ---------------- FETCH PRODUCTS ----------------
   const fetchProducts = async () => {
-    const res = await secureFetch("https://inventory-management-ero4.onrender.com/product");
+    const res = await secureFetch(
+      "https://inventory-management-ero4.onrender.com/product"
+    );
     const data = await res.json();
 
-    // API returns { status, data } so update correctly
     setProducts({ data: data.data || [] });
   };
 
@@ -80,8 +81,8 @@ export default async function secureFetch(url, options = {}) {
     );
 
     if (res.ok) {
-      setProducts(prev => ({
-        data: prev.data.filter(x => x.id !== p.id)
+      setProducts((prev) => ({
+        data: prev.data.filter((x) => x.id !== p.id),
       }));
       alert("Product deleted");
     }
@@ -103,18 +104,13 @@ export default async function secureFetch(url, options = {}) {
       );
       const json = await res.json();
       setSupplierData(json.data ?? null);
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("Failed to load supplier details");
       setSupplierModalOpen(false);
     }
 
     setSupplierLoading(false);
   };
-
-  // ---------------- CURRENCY FORMAT ----------------
-  const formatCurrency = (value) =>
-    "₹" + Number(value || 0).toLocaleString("en-IN");
 
   return (
     <div className="container mt-4">
@@ -126,7 +122,7 @@ export default async function secureFetch(url, options = {}) {
             <tr>
               <th>ID</th>
               <th>Name</th>
-              <th>Supplier</th> {/* NEW */}
+              <th>Supplier</th>
               <th>In Stock</th>
               <th>Sold</th>
               <th>Unit Price</th>
@@ -143,7 +139,7 @@ export default async function secureFetch(url, options = {}) {
                   key={p.id}
                   product={{
                     ...p,
-                    supplier_name: p.supplied_by?.name || "—", // supplier prefetch fix
+                    supplier_name: p.supplied_by?.name || "—",
                   }}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
@@ -161,7 +157,6 @@ export default async function secureFetch(url, options = {}) {
         </table>
       </div>
 
-      {/* SUPPLIER MODAL */}
       <SupplierModal
         open={supplierModalOpen}
         loading={supplierLoading}

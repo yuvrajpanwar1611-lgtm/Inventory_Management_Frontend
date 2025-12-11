@@ -17,26 +17,31 @@ const ProductsTable = () => {
   const navigate = useNavigate();
 
   // ---------------- SECURE FETCH ----------------
-  const secureFetch = async (url, options = {}) => {
-    const token = localStorage.getItem("token");
+export default async function secureFetch(url, options = {}) {
+  const token = localStorage.getItem("token");
 
-    const headers = {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    };
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
 
-    if (token) headers.Authorization = "Bearer " + token;
+  if (token) headers.Authorization = "Bearer " + token;
 
-    const res = await fetch(url, { ...options, headers });
+  const res = await fetch(url, { ...options, headers });
 
-    if (res.status === 401) {
+  // ⛔ If backend says 401, only logout IF token exists
+  if (res.status === 401) {
+    console.warn("Backend returned 401 → token probably invalid");
+
+    if (token) {
       alert("Session expired. Please login again.");
       localStorage.removeItem("token");
       window.location.href = "/login";
     }
+  }
 
-    return res;
-  };
+  return res;
+}
 
   // ---------------- FETCH PRODUCTS ----------------
   const fetchProducts = async () => {

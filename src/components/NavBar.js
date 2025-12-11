@@ -72,7 +72,7 @@ const NavBar = () => {
 
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return; // ❗ WAIT until token exists before calling API
+    if (!token) return;
 
     try {
       const res = await fetch("https://inventory-management-ero4.onrender.com/users/me", {
@@ -81,22 +81,20 @@ const NavBar = () => {
         },
       });
 
-      if (res.status === 401) {
-        // ❗ Do NOT logout immediately, just stop loading user
-        console.warn("Unauthorized /users/me — but token exists. Not logging out.");
+      if (!res.ok) {
+        console.warn("User fetch failed");
         return;
       }
 
       const data = await res.json();
       setUser(data);
     } catch (err) {
-      console.error("User fetch failed:", err);
+      console.error("User fetch error:", err);
     }
   };
 
   useEffect(() => {
-    // ❗ Delay fetch until token is ready
-    setTimeout(fetchUser, 150); 
+    fetchUser();
   }, []);
 
   return (
@@ -107,12 +105,19 @@ const NavBar = () => {
         <Link to="/purchase" className="nav-link text-white">Purchase Product</Link>
         <Link to="/sell" className="nav-link text-white">Sell Product</Link>
         <Link to="/suppliers" className="nav-link text-white">Suppliers</Link>
-        <Link to="/movement/1" className="nav-link text-white">Movement</Link>
+
+        {/* ❗ FIXED */}
+        <Link to="/movements" className="nav-link text-white">Movement</Link>
       </div>
 
       <div className="ms-auto d-flex align-items-center gap-3 text-white">
         <span>Products: {products.data.length}</span>
-        {user && <span>👤 {user.username}</span>}
+
+        {user && (
+          <span className="fw-bold">
+            👤 {user.full_name || user.username}
+          </span>
+        )}
 
         <button
           className="btn btn-light btn-sm"

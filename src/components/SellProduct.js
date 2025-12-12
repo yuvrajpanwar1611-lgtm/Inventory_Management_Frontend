@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import useSecureFetch from "../useSecureFetch"; // ✅ CORRECT HOOK IMPORT
+import useSecureFetch from "../useSecureFetch";
+import { API_ENDPOINTS } from "../config";
 
 const SellProduct = () => {
   const secureFetch = useSecureFetch(); // ✅ HOOK CALLED ONCE AT TOP
@@ -20,9 +21,7 @@ const SellProduct = () => {
 
   /* ---------------------- LOAD PRODUCTS ---------------------- */
   const loadProducts = useCallback(async () => {
-    const res = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/product"
-    );
+    const res = await secureFetch(API_ENDPOINTS.PRODUCTS);
     const data = await res.json();
     setProducts(data.data || []);
   }, [secureFetch]);
@@ -81,9 +80,12 @@ const SellProduct = () => {
     // Validate rows
     for (const row of rows) {
       if (!row.product_id) return alert("Select product in all rows");
-      if (row.qty <= 0) return alert("Quantity must be > 0");
+      const qtyNum = Number(row.qty);
+      const priceNum = Number(row.sell_price);
+      if (Number.isNaN(qtyNum) || qtyNum <= 0) return alert("Quantity must be > 0");
+      if (Number.isNaN(priceNum) || priceNum < 0) return alert("Enter a valid sell price");
 
-      if (row.qty > row.max_stock) {
+      if (qtyNum > row.max_stock) {
         const ok = window.confirm(`${row.name} has only ${row.max_stock} left. Continue?`);
         if (!ok) return;
       }
@@ -106,13 +108,10 @@ const SellProduct = () => {
 
     setLoading(true);
 
-    const res = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/product/sell",
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
+    const res = await secureFetch(API_ENDPOINTS.SELL_PRODUCT, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
 
     const data = await res.json();
     setLoading(false);
@@ -124,7 +123,7 @@ const SellProduct = () => {
 
     alert("Sale completed!");
 
-    setInvoiceUrl("https://inventory-management-ero4.onrender.com" + data.invoice_pdf);
+    setInvoiceUrl(API_ENDPOINTS.BASE_URL + data.invoice_pdf);
 
     // Reset form
     setRows([

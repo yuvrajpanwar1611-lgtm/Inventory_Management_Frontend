@@ -1,7 +1,7 @@
 // src/components/AddProducts.js
-import React, { useState, useEffect, useContext } from "react";
-import { AuthContext } from "../AuthContext";
+import React, { useState } from "react";
 import useSecureFetch from "../useSecureFetch";
+import { API_ENDPOINTS } from "../config";
 
 const AddProducts = () => {
   const [info, setInfo] = useState({
@@ -11,15 +11,7 @@ const AddProducts = () => {
     ProfitPerPiece: "",
   });
 
-  const { token } = useContext(AuthContext);
   const secureFetch = useSecureFetch();
-
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!token) {
-      window.location.href = "/login";
-    }
-  }, [token]);
 
   const handleChange = (e) => {
     setInfo({ ...info, [e.target.name]: e.target.value });
@@ -28,22 +20,35 @@ const AddProducts = () => {
   const postData = async (e) => {
     e.preventDefault();
 
+    const unitPrice = Number(info.UnitPrice);
+    const profit = Number(info.ProfitPerPiece);
+
+    if (Number.isNaN(unitPrice) || unitPrice < 0) {
+      alert("Enter a valid Unit Price");
+      return;
+    }
+    if (Number.isNaN(profit) || profit < 0) {
+      alert("Enter a valid Profit Per Piece");
+      return;
+    }
+    if (!info.Supplier.trim()) {
+      alert("Supplier ID is required");
+      return;
+    }
+
     const payload = {
       name: info.ProductName,
       quantity_in_stock: 0,
       quantity_sold: 0,
-      unit_price: Number(info.UnitPrice),
+      unit_price: unitPrice,
       revenue: 0,
-      profit_per_piece: Number(info.ProfitPerPiece),
+      profit_per_piece: profit,
     };
 
-    const res = await secureFetch(
-      `https://inventory-management-ero4.onrender.com/product/${info.Supplier}`,
-      {
-        method: "POST",
-        body: JSON.stringify(payload),
-      }
-    );
+    const res = await secureFetch(API_ENDPOINTS.ADD_PRODUCT(info.Supplier), {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
 
     if (!res.ok) {
       const error = await res.json();

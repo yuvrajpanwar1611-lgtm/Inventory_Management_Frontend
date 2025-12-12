@@ -2,6 +2,7 @@
 import React, { useContext, useEffect } from "react";
 import { UpdateProductContext } from "../UpdateProductContext";
 import useSecureFetch from "../useSecureFetch";
+import { API_ENDPOINTS } from "../config";
 
 const UpdateProduct = () => {
   const [info, setInfo] = useContext(UpdateProductContext);
@@ -30,23 +31,35 @@ const UpdateProduct = () => {
   const updateData = async (e) => {
     e.preventDefault();
 
+    const quantity_in_stock = Number(info.QuantityInStock);
+    const quantity_sold = Number(info.QuantitySold);
+    const unit_price = Number(info.UnitPrice);
+    const revenue = Number(info.Revenue);
+    const profit_per_piece = Number(info.ProfitPerPiece);
+
+    if (
+      [quantity_in_stock, quantity_sold, unit_price, revenue, profit_per_piece].some(
+        (n) => Number.isNaN(n)
+      )
+    ) {
+      alert("All numeric fields must be valid numbers");
+      return;
+    }
+
     const payload = {
       name: info.ProductName,
-      quantity_in_stock: Number(info.QuantityInStock),
-      quantity_sold: Number(info.QuantitySold),
-      unit_price: Number(info.UnitPrice),
-      revenue: Number(info.Revenue),
-      profit_per_piece: Number(info.ProfitPerPiece),
+      quantity_in_stock,
+      quantity_sold,
+      unit_price,
+      revenue,
+      profit_per_piece,
     };
 
-    const res = await secureFetch(
-      `https://inventory-management-ero4.onrender.com/product/${info.ProductId}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
+    const res = await secureFetch(API_ENDPOINTS.PRODUCT_BY_ID(info.ProductId), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
     if (res.ok) {
       alert("Product updated successfully!");

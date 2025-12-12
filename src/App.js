@@ -163,8 +163,8 @@ function Layout() {
 
   return (
     <>
-      {/* Navbar visible when NOT on login/signup */}
-      {!hideUI && <NavBar />}
+      {/* Navbar visible when authenticated and not on login/signup */}
+      {!hideUI && token && <NavBar />}
 
       <Routes>
         {/* ---------- PUBLIC ROUTES ---------- */}
@@ -227,7 +227,7 @@ function Layout() {
         />
 
         <Route
-          path="/movement/:id"
+          path="/movement"
           element={
             <ProtectedRoute>
               <StockMovement />

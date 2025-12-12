@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
-import useSecureFetch from "../useSecureFetch"; // ✅ CORRECT IMPORT
+import useSecureFetch from "../useSecureFetch";
+import { API_ENDPOINTS } from "../config";
 
 const StockMovement = () => {
   const secureFetch = useSecureFetch(); // ✅ HOOK CALLED ONCE
@@ -20,9 +21,7 @@ const StockMovement = () => {
 
   /* ---------------- LOAD MOVEMENTS ---------------- */
   const loadMovements = useCallback(async () => {
-    const res = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/movements"
-    );
+    const res = await secureFetch(API_ENDPOINTS.MOVEMENTS);
     const data = await res.json();
     setMovements(data.data || []);
     setFilteredMovements(data.data || []);
@@ -30,9 +29,7 @@ const StockMovement = () => {
 
   /* ---------------- LOAD PRODUCTS ---------------- */
   const loadProducts = useCallback(async () => {
-    const res = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/product"
-    );
+    const res = await secureFetch(API_ENDPOINTS.PRODUCTS);
     const data = await res.json();
     setProducts(data.data || []);
   }, [secureFetch]);
@@ -143,7 +140,7 @@ const StockMovement = () => {
 
                   {m.invoice_number && (
                     <a
-                      href={`https://inventory-management-ero4.onrender.com/download_invoice/${m.invoice_number}`}
+                      href={API_ENDPOINTS.DOWNLOAD_INVOICE(m.invoice_number)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-primary btn-sm mt-2"

@@ -5,7 +5,8 @@ import { UpdateProductContext } from "../UpdateProductContext";
 import ProductRow from "./ProductRow";
 import SupplierModal from "./SupplierModal";
 import { useNavigate } from "react-router-dom";
-import useSecureFetch from "../useSecureFetch"; // IMPORTANT
+import useSecureFetch from "../useSecureFetch";
+import { API_ENDPOINTS } from "../config";
 
 const ProductsTable = () => {
   const [products, setProducts] = useContext(ProductContext);
@@ -20,9 +21,7 @@ const ProductsTable = () => {
 
   /* ---------------- FETCH PRODUCTS ---------------- */
   const fetchProducts = useCallback(async () => {
-    const res = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/product"
-    );
+    const res = await secureFetch(API_ENDPOINTS.PRODUCTS);
 
     if (!res.ok) return;
 
@@ -52,10 +51,9 @@ const ProductsTable = () => {
   const handleDelete = async (p) => {
     if (!window.confirm("Delete this product?")) return;
 
-    const res = await secureFetch(
-      `https://inventory-management-ero4.onrender.com/product/${p.id}`,
-      { method: "DELETE" }
-    );
+    const res = await secureFetch(API_ENDPOINTS.PRODUCT_BY_ID(p.id), {
+      method: "DELETE",
+    });
 
     if (res.ok) {
       setProducts((prev) => ({
@@ -76,9 +74,7 @@ const ProductsTable = () => {
     setSupplierLoading(true);
 
     try {
-      const res = await secureFetch(
-        `https://inventory-management-ero4.onrender.com/supplier/${supplierId}`
-      );
+      const res = await secureFetch(API_ENDPOINTS.SUPPLIER_BY_ID(supplierId));
 
       const json = await res.json();
       setSupplierData(json.data || null);

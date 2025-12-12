@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import useSecureFetch from "../useSecureFetch"; // ✅ Correct import
+import useSecureFetch from "../useSecureFetch";
+import { API_ENDPOINTS } from "../config";
 
 const PurchaseProduct = () => {
   const secureFetch = useSecureFetch(); // ✅ Hook can ONLY be used here
@@ -15,14 +16,10 @@ const PurchaseProduct = () => {
 
   /* ---------------- LOAD PRODUCTS + SUPPLIERS ---------------- */
   const loadData = useCallback(async () => {
-    const prodRes = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/product"
-    );
+    const prodRes = await secureFetch(API_ENDPOINTS.PRODUCTS);
     const prodJson = await prodRes.json();
 
-    const supRes = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/supplier"
-    );
+    const supRes = await secureFetch(API_ENDPOINTS.SUPPLIERS);
     const supJson = await supRes.json();
 
     setProducts(prodJson.data || []);
@@ -50,14 +47,25 @@ const PurchaseProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const supplierId = Number(form.supplier_id);
+    const quantity = Number(form.quantity);
+    const buyPrice = Number(form.buy_price);
+
+    if (!form.productId) return alert("Select a product");
+    if (Number.isNaN(supplierId)) return alert("Select a supplier");
+    if (Number.isNaN(quantity) || quantity <= 0)
+      return alert("Quantity must be a positive number");
+    if (Number.isNaN(buyPrice) || buyPrice < 0)
+      return alert("Buy price must be zero or positive");
+
     const payload = {
-      supplier_id: Number(form.supplier_id),
-      quantity: Number(form.quantity),
-      buy_price: Number(form.buy_price),
+      supplier_id: supplierId,
+      quantity,
+      buy_price: buyPrice,
     };
 
     const res = await secureFetch(
-      `https://inventory-management-ero4.onrender.com/product/purchase/${form.productId}`,
+      API_ENDPOINTS.PURCHASE_PRODUCT(form.productId),
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

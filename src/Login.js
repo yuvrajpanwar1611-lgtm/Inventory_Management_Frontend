@@ -58,6 +58,7 @@
 // src/Login.js
 import React, { useState, useContext } from "react";
 import { AuthContext } from "./AuthContext";
+import { API_ENDPOINTS } from "./config";
 
 const Login = () => {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -71,13 +72,10 @@ const Login = () => {
     body.append("password", form.password);
 
     try {
-      const res = await fetch(
-        "https://inventory-management-ero4.onrender.com/token",
-        {
-          method: "POST",
-          body,
-        }
-      );
+      const res = await fetch(API_ENDPOINTS.LOGIN, {
+        method: "POST",
+        body,
+      });
 
       const data = await res.json();
 

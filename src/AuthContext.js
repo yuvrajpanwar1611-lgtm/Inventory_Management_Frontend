@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
+  const [loading, setLoading] = useState(false);
 
   /* -----------------------------------------------------
       OPTIONAL — Decode JWT for expiry check
@@ -27,19 +28,17 @@ export const AuthProvider = ({ children }) => {
       CHECK TOKEN EXPIRY ONLY ON FIRST LOAD
       (NO auto logout loops — safe)
   ------------------------------------------------------ */
+  // Re-check expiry whenever token changes
   useEffect(() => {
     if (!token) return;
 
     const payload = parseJwt(token);
-    if (payload?.exp) {
-      const expMs = payload.exp * 1000;
-      if (Date.now() > expMs) {
-        console.warn("Token expired — clearing locally.");
-        localStorage.removeItem("token");
-        setToken(null);
-      }
+    if (payload?.exp && Date.now() > payload.exp * 1000) {
+      console.warn("Token expired — clearing locally.");
+      localStorage.removeItem("token");
+      setToken(null);
     }
-  }, [token]); // runs on token change to re-check expiry
+  }, [token]);
 
   /* -----------------------------------------------------
       LOGIN — Save token + update React + redirect
@@ -47,6 +46,7 @@ export const AuthProvider = ({ children }) => {
   const login = (newToken) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
+    setLoading(false);
 
     setTimeout(() => {
       window.location.href = "/";
@@ -68,7 +68,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const onStorage = () => {
       const updated = localStorage.getItem("token");
-      setToken(updated);
+      setToken(updated || null);
+      setLoading(false);
     };
 
     window.addEventListener("storage", onStorage);
@@ -76,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

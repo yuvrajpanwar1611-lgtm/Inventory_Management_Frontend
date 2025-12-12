@@ -4,11 +4,11 @@ import { Navigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { token } = useContext(AuthContext);
+  const { token, loading } = useContext(AuthContext);
 
-  // token = undefined → context has not loaded yet
-  if (token === undefined) {
-    return <div className="text-center mt-5">Loading...</div>;
+  // Still resolving token from storage
+  if (loading) {
+    return <div className="text-center mt-5">Checking session...</div>;
   }
 
   // No token → redirect

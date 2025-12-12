@@ -17,9 +17,9 @@ export function useSecureFetch() {
 
     const res = await fetch(url, { ...options, headers });
 
-    if (res.status === 401) {
-      alert("Session expired. Please login again.");
-      logout();
+    if (res.status === 401 && token) {
+      // Do not auto-logout; surface the error and let caller decide.
+      console.warn("Auth 401 from API; not logging out automatically.");
     }
 
     return res;

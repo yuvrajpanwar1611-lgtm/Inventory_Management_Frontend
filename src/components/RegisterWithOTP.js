@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import useSecureFetch from "../useSecureFetch"; // ✅ Correct hook import
 
 const RegisterWithOTP = () => {
@@ -21,12 +20,12 @@ const RegisterWithOTP = () => {
     setLoading(true);
 
     try {
-      await axios.post(
-        "https://inventory-management-ero4.onrender.com/send-otp",
-        { mobile }
-      );
+      await secureFetch("https://inventory-management-ero4.onrender.com/send-otp", {
+        method: "POST",
+        body: JSON.stringify({ mobile }),
+      });
 
-      alert("OTP sent! (Static OTP = 123456)");
+      alert("OTP sent.");
       setOtpSent(true);
     } catch (error) {
       console.error(error);
@@ -45,12 +44,17 @@ const RegisterWithOTP = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
+      const res = await secureFetch(
         "https://inventory-management-ero4.onrender.com/verify-otp",
-        { mobile, otp: Number(otp) }
+        {
+          method: "POST",
+          body: JSON.stringify({ mobile, otp: Number(otp) }),
+        }
       );
 
-      if (res.data.verified) {
+      const data = await res.json();
+
+      if (data.verified) {
         alert("✅ Mobile Verified Successfully!");
         setVerified(true);
       } else {

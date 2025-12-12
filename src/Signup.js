@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useSecureFetch } from "./useSecureFetch";
+import { API_ENDPOINTS } from "./config";
 
 const Signup = () => {
-  const BASE_URL = "https://inventory-management-ero4.onrender.com";
   const secureFetch = useSecureFetch();
 
   const [form, setForm] = useState({
@@ -29,32 +29,52 @@ const Signup = () => {
   const sendEmailOtp = async () => {
     if (!form.email) return alert("Enter email");
 
-    const res = await secureFetch(`${BASE_URL}/send-email-otp`, {
-      method: "POST",
-      body: JSON.stringify({ email: form.email }),
-    });
+    try {
+      const res = await secureFetch(API_ENDPOINTS.SEND_EMAIL_OTP, {
+        method: "POST",
+        body: JSON.stringify({ email: form.email }),
+      });
 
-    const data = await res.json();
-    alert(`Email OTP Sent: ${data.otp_for_testing}`);
-    setEmailOtpSent(true);
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Email OTP sent.");
+        setEmailOtpSent(true);
+        setEmailVerified(false); // Reset verification status
+        setEmailOtp(""); // Clear previous OTP
+      } else {
+        alert(data.detail || "Failed to send OTP");
+      }
+    } catch (err) {
+      alert("Failed to send OTP. Please try again.");
+    }
   };
 
   // ----------------------------------------------------
   // VERIFY EMAIL OTP
   // ----------------------------------------------------
   const verifyEmailOtp = async () => {
-    const res = await secureFetch(`${BASE_URL}/verify-email-otp`, {
-      method: "POST",
-      body: JSON.stringify({ email: form.email, otp: emailOtp }),
-    });
+    if (!emailOtp) {
+      alert("Please enter the OTP");
+      return;
+    }
 
-    const data = await res.json();
+    try {
+      const res = await secureFetch(API_ENDPOINTS.VERIFY_EMAIL_OTP, {
+        method: "POST",
+        body: JSON.stringify({ email: form.email, otp: parseInt(emailOtp) }),
+      });
 
-    if (data.verified) {
-      setEmailVerified(true);
-      alert("Email Verified!");
-    } else {
-      alert("Invalid OTP");
+      const data = await res.json();
+
+      if (res.ok && data.verified) {
+        setEmailVerified(true);
+        alert("Email Verified!");
+      } else {
+        alert(data.detail || "Invalid OTP");
+      }
+    } catch (err) {
+      alert("Failed to verify OTP. Please try again.");
     }
   };
 
@@ -64,32 +84,52 @@ const Signup = () => {
   const sendPhoneOtp = async () => {
     if (!form.phone) return alert("Enter phone");
 
-    const res = await secureFetch(`${BASE_URL}/send-otp`, {
-      method: "POST",
-      body: JSON.stringify({ mobile: form.phone }),
-    });
+    try {
+      const res = await secureFetch(API_ENDPOINTS.SEND_PHONE_OTP, {
+        method: "POST",
+        body: JSON.stringify({ mobile: form.phone }),
+      });
 
-    const data = await res.json();
-    alert(`Phone OTP Sent: ${data.otp_for_testing}`);
-    setPhoneOtpSent(true);
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Phone OTP sent.");
+        setPhoneOtpSent(true);
+        setPhoneVerified(false); // Reset verification status
+        setPhoneOtp(""); // Clear previous OTP
+      } else {
+        alert(data.detail || "Failed to send OTP");
+      }
+    } catch (err) {
+      alert("Failed to send OTP. Please try again.");
+    }
   };
 
   // ----------------------------------------------------
   // VERIFY PHONE OTP
   // ----------------------------------------------------
   const verifyPhoneOtp = async () => {
-    const res = await secureFetch(`${BASE_URL}/verify-otp`, {
-      method: "POST",
-      body: JSON.stringify({ mobile: form.phone, otp: phoneOtp }),
-    });
+    if (!phoneOtp) {
+      alert("Please enter the OTP");
+      return;
+    }
 
-    const data = await res.json();
+    try {
+      const res = await secureFetch(API_ENDPOINTS.VERIFY_PHONE_OTP, {
+        method: "POST",
+        body: JSON.stringify({ mobile: form.phone, otp: parseInt(phoneOtp) }),
+      });
 
-    if (data.verified) {
-      setPhoneVerified(true);
-      alert("Phone Verified!");
-    } else {
-      alert("Invalid OTP");
+      const data = await res.json();
+
+      if (res.ok && data.verified) {
+        setPhoneVerified(true);
+        alert("Phone Verified!");
+      } else {
+        alert(data.detail || data.reason || "Invalid OTP");
+      }
+    } catch (err) {
+      alert("Failed to verify OTP. Please try again.");
     }
   };
 
@@ -104,7 +144,7 @@ const Signup = () => {
 
     setLoading(true);
 
-    const res = await secureFetch(`${BASE_URL}/signup`, {
+    const res = await secureFetch(API_ENDPOINTS.SIGNUP, {
       method: "POST",
       body: JSON.stringify(form),
     });

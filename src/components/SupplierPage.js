@@ -1,6 +1,7 @@
 // src/components/SupplierPage.js
 import React, { useEffect, useState, useCallback } from "react";
 import useSecureFetch from "../useSecureFetch";
+import { API_ENDPOINTS } from "../config";
 
 const SupplierPage = () => {
   const secureFetch = useSecureFetch();
@@ -17,9 +18,7 @@ const SupplierPage = () => {
 
   /* -------------------- LOAD SUPPLIERS -------------------- */
   const loadSuppliers = useCallback(async () => {
-    const res = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/supplier"
-    );
+    const res = await secureFetch(API_ENDPOINTS.SUPPLIERS);
 
     if (!res.ok) return;
 
@@ -40,14 +39,11 @@ const SupplierPage = () => {
   const addSupplier = async (e) => {
     e.preventDefault();
 
-    const res = await secureFetch(
-      "https://inventory-management-ero4.onrender.com/supplier",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      }
-    );
+    const res = await secureFetch(API_ENDPOINTS.SUPPLIERS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
 
     if (!res.ok) {
       alert("Failed to add supplier");
@@ -63,14 +59,11 @@ const SupplierPage = () => {
   const updateSupplier = async (e) => {
     e.preventDefault();
 
-    const res = await secureFetch(
-      `https://inventory-management-ero4.onrender.com/supplier/${edit.id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(edit),
-      }
-    );
+    const res = await secureFetch(API_ENDPOINTS.SUPPLIER_BY_ID(edit.id), {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(edit),
+    });
 
     if (!res.ok) {
       alert("Failed to update supplier");
@@ -86,12 +79,9 @@ const SupplierPage = () => {
   const deleteSupplier = async (id) => {
     if (!window.confirm("Delete this supplier?")) return;
 
-    const res = await secureFetch(
-      `https://inventory-management-ero4.onrender.com/supplier/${id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const res = await secureFetch(API_ENDPOINTS.SUPPLIER_BY_ID(id), {
+      method: "DELETE",
+    });
 
     if (res.ok) {
       alert("Supplier deleted");

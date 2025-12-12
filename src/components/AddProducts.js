@@ -1,6 +1,6 @@
 // src/components/AddProducts.js
 import React, { useState } from "react";
-import useSecureFetch from "../useSecureFetch";
+import { useSecureFetch } from "../useSecureFetch";
 import { API_ENDPOINTS } from "../config";
 
 const AddProducts = () => {

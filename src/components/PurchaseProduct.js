@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import useSecureFetch from "../useSecureFetch";
+import { useSecureFetch } from "../useSecureFetch";
 import { API_ENDPOINTS } from "../config";
 
 const PurchaseProduct = () => {

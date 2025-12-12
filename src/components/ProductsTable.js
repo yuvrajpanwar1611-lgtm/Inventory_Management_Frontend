@@ -5,7 +5,7 @@ import { UpdateProductContext } from "../UpdateProductContext";
 import ProductRow from "./ProductRow";
 import SupplierModal from "./SupplierModal";
 import { useNavigate } from "react-router-dom";
-import useSecureFetch from "../useSecureFetch";
+import { useSecureFetch } from "../useSecureFetch";
 import { API_ENDPOINTS } from "../config";
 
 const ProductsTable = () => {

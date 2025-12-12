@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useSecureFetch from "../useSecureFetch"; // ✅ Correct hook import
+import { useSecureFetch } from "../useSecureFetch"; // ✅ Correct hook import
 
 const RegisterWithOTP = () => {
   const secureFetch = useSecureFetch(); // ✅ Hook used correctly at top level

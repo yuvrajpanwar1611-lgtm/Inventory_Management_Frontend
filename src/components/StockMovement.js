@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import useSecureFetch from "../useSecureFetch";
+import { useSecureFetch } from "../useSecureFetch";
 import { API_ENDPOINTS } from "../config";
 
 const StockMovement = () => {

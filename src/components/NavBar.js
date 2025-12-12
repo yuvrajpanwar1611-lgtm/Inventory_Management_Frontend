@@ -68,7 +68,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ProductContext } from "../ProductContext";
 import { AuthContext } from "../AuthContext";
-import useSecureFetch from "../useSecureFetch";
+import { useSecureFetch } from "../useSecureFetch";
 import { API_ENDPOINTS } from "../config";
 
 const NavBar = () => {

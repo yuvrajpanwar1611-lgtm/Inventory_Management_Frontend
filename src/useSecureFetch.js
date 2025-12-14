@@ -6,8 +6,8 @@ export function useSecureFetch() {
   const { token, logout } = useContext(AuthContext);
 
   return useCallback(async (url, options = {}) => {
+    // Merge headers without forcing JSON content-type (supports file downloads, form posts, etc.)
     const headers = {
-      "Content-Type": "application/json",
       ...(options.headers || {}),
     };
 
@@ -23,7 +23,7 @@ export function useSecureFetch() {
     }
 
     return res;
-  }, [logout, token]);
+  }, [token]);
 }
 
 // Support both default and named imports across the app

@@ -26,7 +26,7 @@ export const API_ENDPOINTS = {
   PRODUCT_BY_ID: (id) => `${API_BASE_URL}/product/${id}`,
   ADD_PRODUCT: (supplierId) => `${API_BASE_URL}/product/${supplierId}`,
   PURCHASE_PRODUCT: (productId) => `${API_BASE_URL}/product/purchase/${productId}`,
-  SELL_PRODUCT: `${API_BASE_URL}/product/sell`,
+  SELL_PRODUCT: `${API_BASE_URL}/product/sell-multi`,
   PRODUCT_MOVEMENTS: (productId) => `${API_BASE_URL}/product/${productId}/movements`,
   
   // Supplier endpoints
@@ -41,4 +41,3 @@ export const API_ENDPOINTS = {
 };
 
 export default API_ENDPOINTS;
-

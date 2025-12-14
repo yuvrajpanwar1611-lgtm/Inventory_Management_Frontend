@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useSecureFetch } from "../useSecureFetch"; // ✅ Correct hook import
+import { API_ENDPOINTS } from "../config";
 
 const RegisterWithOTP = () => {
   const secureFetch = useSecureFetch(); // ✅ Hook used correctly at top level
@@ -20,7 +21,7 @@ const RegisterWithOTP = () => {
     setLoading(true);
 
     try {
-      await secureFetch("https://inventory-management-ero4.onrender.com/send-otp", {
+      await secureFetch(API_ENDPOINTS.SEND_PHONE_OTP, {
         method: "POST",
         body: JSON.stringify({ mobile }),
       });
@@ -44,13 +45,10 @@ const RegisterWithOTP = () => {
     setLoading(true);
 
     try {
-      const res = await secureFetch(
-        "https://inventory-management-ero4.onrender.com/verify-otp",
-        {
-          method: "POST",
-          body: JSON.stringify({ mobile, otp: Number(otp) }),
-        }
-      );
+      const res = await secureFetch(API_ENDPOINTS.VERIFY_PHONE_OTP, {
+        method: "POST",
+        body: JSON.stringify({ mobile, otp: Number(otp) }),
+      });
 
       const data = await res.json();
 

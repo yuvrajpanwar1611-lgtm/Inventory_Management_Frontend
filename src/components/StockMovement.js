@@ -39,6 +39,30 @@ const StockMovement = () => {
     loadProducts();
   }, [loadMovements, loadProducts]);
 
+  const downloadInvoice = async (invoiceNumber) => {
+    try {
+      const res = await secureFetch(API_ENDPOINTS.DOWNLOAD_INVOICE(invoiceNumber), {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        alert("Invoice download failed");
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${invoiceNumber}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Invoice download error:", err);
+      alert("Invoice download failed");
+    }
+  };
+
   /* ---------------- FILTER HANDLER ---------------- */
   const handleFilter = (productId) => {
     setSelectedProduct(productId);
@@ -139,14 +163,13 @@ const StockMovement = () => {
                   </p>
 
                   {m.invoice_number && (
-                    <a
-                      href={API_ENDPOINTS.DOWNLOAD_INVOICE(m.invoice_number)}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
                       className="btn btn-primary btn-sm mt-2"
+                      onClick={() => downloadInvoice(m.invoice_number)}
                     >
                       Download Invoice
-                    </a>
+                    </button>
                   )}
                 </>
               )}

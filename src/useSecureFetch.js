@@ -30,29 +30,28 @@
 // export default useSecureFetch;
 
 
+// src/useSecureFetch.js
+import { useCallback, useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
-const useSecureFetch = async (url, options = {}) => {
-  const token = localStorage.getItem("token");
+export function useSecureFetch() {
+  const { token } = useContext(AuthContext);
 
-  if (!token) {
-    throw new Error("No auth token found");
-  }
-
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+  return useCallback(async (url, options = {}) => {
+    const headers = {
       ...(options.headers || {}),
-    },
-  });
+      Authorization: token ? `Bearer ${token}` : undefined,
+      "Content-Type": "application/json",
+    };
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || res.statusText);
-  }
+    const res = await fetch(url, {
+      ...options,
+      mode: "cors",
+      headers,
+    });
 
-  return res;
-};
+    return res;
+  }, [token]);
+}
 
 export default useSecureFetch;

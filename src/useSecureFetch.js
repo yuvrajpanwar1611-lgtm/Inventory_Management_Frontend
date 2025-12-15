@@ -1,30 +1,58 @@
-// src/useSecureFetch.js
-import { useCallback, useContext } from "react";
-import { AuthContext } from "./AuthContext";
+// // src/useSecureFetch.js
+// import { useCallback, useContext } from "react";
+// import { AuthContext } from "./AuthContext";
 
-export function useSecureFetch() {
-  const { token, logout } = useContext(AuthContext);
+// export function useSecureFetch() {
+//   const { token, logout } = useContext(AuthContext);
 
-  return useCallback(async (url, options = {}) => {
-    // Merge headers without forcing JSON content-type (supports file downloads, form posts, etc.)
-    const headers = {
+//   return useCallback(async (url, options = {}) => {
+//     // Merge headers without forcing JSON content-type (supports file downloads, form posts, etc.)
+//     const headers = {
+//       ...(options.headers || {}),
+//     };
+
+//     if (token) {
+//       headers.Authorization = "Bearer " + token;
+//     }
+
+//     const res = await fetch(url, { ...options, headers });
+
+//     if (res.status === 401 && token) {
+//       // Do not auto-logout; surface the error and let caller decide.
+//       console.warn("Auth 401 from API; not logging out automatically.");
+//     }
+
+//     return res;
+//   }, [token]);
+// }
+
+// // Support both default and named imports across the app
+// export default useSecureFetch;
+
+
+
+const useSecureFetch = async (url, options = {}) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("No auth token found");
+  }
+
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
       ...(options.headers || {}),
-    };
+    },
+  });
 
-    if (token) {
-      headers.Authorization = "Bearer " + token;
-    }
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || res.statusText);
+  }
 
-    const res = await fetch(url, { ...options, headers });
+  return res;
+};
 
-    if (res.status === 401 && token) {
-      // Do not auto-logout; surface the error and let caller decide.
-      console.warn("Auth 401 from API; not logging out automatically.");
-    }
-
-    return res;
-  }, [token]);
-}
-
-// Support both default and named imports across the app
 export default useSecureFetch;
